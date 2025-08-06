@@ -69,8 +69,9 @@ public class ProfileActivity extends AppCompatActivity {
 
                     if (rowsInserted > 0) {
                         Toast.makeText(this, "Cuenta creada con éxito", Toast.LENGTH_SHORT).show();
-                        Intent intent = new Intent(this, GarageActivity.class);
-                        startActivity(intent);
+                        Intent i = new Intent(this, GarageActivity.class);
+                        i.putExtra("email", email);
+                        startActivity(i);
                         finish();
                     } else {
                         Toast.makeText(this, "Error al crear la cuenta", Toast.LENGTH_SHORT).show();

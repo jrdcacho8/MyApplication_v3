@@ -1,17 +1,19 @@
 package pupr.capstone.myapplication;
 
+import android.graphics.Bitmap;
+
 public class Auto {
     private String nombre;
     private String tablilla;
-    private int imagenResId;
+    private Bitmap imagenBitmap;
 
-    public Auto(String nombre, String tablilla, int imagenResId) {
+    public Auto(String nombre, String tablilla, Bitmap imagenBitmap) {
         this.nombre = nombre;
         this.tablilla = tablilla;
-        this.imagenResId = imagenResId;
+        this.imagenBitmap = imagenBitmap;
     }
 
     public String getNombre() { return nombre; }
     public String getTablilla() { return tablilla; }
-    public int getImagenResId() { return imagenResId; }
+    public Bitmap getImagenBitmap() { return imagenBitmap; }
 }

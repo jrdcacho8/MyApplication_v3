@@ -23,6 +23,7 @@ public class AddCar extends AppCompatActivity {
 
     Button btnPickImage;
     ImageView imageView;
+    String userEmail;
     ActivityResultLauncher<Intent> resultLauncher;
     Spinner spinnerMarca, spinnerModelo;
     Map<String, List<String>> modelos = new HashMap<>();
@@ -32,6 +33,9 @@ public class AddCar extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         EdgeToEdge.enable(this);
         setContentView(R.layout.activity_add_car);
+
+        userEmail = getIntent().getStringExtra("email");
+
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main), (v, insets) -> {
             Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
@@ -142,6 +146,70 @@ public class AddCar extends AppCompatActivity {
                 }
         );
     }
+    public void guardarVehiculo(View v){
+        EditText editTextYear = findViewById(R.id.editTextYear);
+        EditText editTextMilleage = findViewById(R.id.editTextMilleage);
+        EditText editTextLicensePlate = findViewById(R.id.editTextLicensePlate);
+        Spinner spinnerMarca = findViewById(R.id.spinnerMarca);
+        Spinner spinnerModelo = findViewById(R.id.spinnerModelo);
+        ImageView imageView = findViewById(R.id.imageViewGallery);
+
+        String year = editTextYear.getText().toString();
+        String milleage = editTextMilleage.getText().toString();
+        String licensePlate = editTextLicensePlate.getText().toString();
+        String marca = spinnerMarca.getSelectedItem().toString();
+        String modelo = spinnerModelo.getSelectedItem().toString();
+
+        // Validaciones mínimas
+        if (year.isEmpty() || milleage.isEmpty() || licensePlate.isEmpty() ||
+                marca.equals("Seleccione una marca") || modelo.isEmpty()) {
+            Toast.makeText(this, "Todos los campos son requeridos.", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        // Convertir la imagen a bytes
+        imageView.setDrawingCacheEnabled(true);
+        imageView.buildDrawingCache();
+        android.graphics.Bitmap bitmap = imageView.getDrawingCache();
+        java.io.ByteArrayOutputStream stream = new java.io.ByteArrayOutputStream();
+        bitmap.compress(android.graphics.Bitmap.CompressFormat.PNG, 100, stream);
+        byte[] imagenBytes = stream.toByteArray();
+
+        // Conexión e inserción
+        try {
+            MyJDBC jdbc = new MyJDBC();
+            java.sql.Connection con = jdbc.obtenerConexion();
+
+            if (con != null) {
+                String query = "INSERT INTO VEHICULO (YEAR, MODEL, MILLEAGE, LICENSE_PLATE, IMAGEN, EMAIL, BRAND) VALUES (?, ?, ?, ?, ?, ?, ?)";
+                java.sql.PreparedStatement stmt = con.prepareStatement(query);
+                stmt.setInt(1, Integer.parseInt(year));
+                stmt.setString(2, modelo);
+                stmt.setInt(3, Integer.parseInt(milleage));
+                stmt.setString(4, licensePlate);
+                stmt.setBytes(5, imagenBytes);
+                stmt.setString(6, userEmail);  // Pasado por Intent
+                stmt.setString(7, marca);
+
+                int rows = stmt.executeUpdate();
+
+                if (rows > 0) {
+                    Toast.makeText(this, "Vehículo guardado exitosamente", Toast.LENGTH_SHORT).show();
+                    finish(); // O redirigir a otra actividad
+                } else {
+                    Toast.makeText(this, "Error al guardar", Toast.LENGTH_SHORT).show();
+                }
+
+                con.close();
+            } else {
+                Toast.makeText(this, "No se pudo conectar con la base de datos", Toast.LENGTH_SHORT).show();
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            Toast.makeText(this, "Error: " + e.getMessage(), Toast.LENGTH_LONG).show();
+        }
+    }
+
     public void goBack(View v){
         finish();
         overridePendingTransition(R.anim.slide_in_left, R.anim.slide_out_right);

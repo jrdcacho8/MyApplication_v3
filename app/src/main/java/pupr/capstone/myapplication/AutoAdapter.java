@@ -32,7 +32,7 @@ public class AutoAdapter extends RecyclerView.Adapter<AutoAdapter.AutoViewHolder
         Auto auto = listaAutos.get(position);
         holder.nombre.setText(auto.getNombre());
         holder.tablilla.setText("Tablilla " + auto.getTablilla());
-        holder.imagen.setImageResource(auto.getImagenResId());
+        holder.imagen.setImageBitmap(auto.getImagenBitmap());
 
         holder.itemView.setTag(auto);  // <- Aquí se guarda el objeto Auto
     }

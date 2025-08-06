@@ -9,6 +9,94 @@
         tools:context=".AddCar">
 
     <!-- Botón Volver -->
+    <ScrollView
+            android:layout_width="0dp"
+            android:layout_height="0dp" app:layout_constraintTop_toTopOf="@+id/guideline2"
+            app:layout_constraintBottom_toBottomOf="parent" app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent">
+        <LinearLayout
+                android:orientation="vertical"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent">
+            <TextView
+                    android:id="@+id/textView2"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Vehicul actual"
+                    android:textSize="14sp"
+                    android:layout_marginTop="32dp"
+                    android:layout_marginStart="32dp"/>
+            <Spinner
+                    android:id="@+id/spinnerMarca"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:layout_marginStart="32dp"
+                    android:layout_marginEnd="32dp"/>
+            <Spinner
+                    android:id="@+id/spinnerModelo"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:layout_marginStart="32dp"
+                    android:layout_marginEnd="32dp"/>
+            <TextView
+                    android:id="@+id/textView4"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Tablilla"
+                    android:textSize="14sp"
+                    android:layout_marginStart="32dp"
+                    android:layout_marginTop="20dp"/>
+            <EditText
+                    android:id="@+id/editTextLicensePlate"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:hint="000-000"
+                    android:textSize="14sp"
+                    android:inputType="text"
+                    android:layout_marginStart="32dp"
+                    android:layout_marginEnd="32dp"
+                    android:layout_marginTop="12dp"/>
+            <TextView
+                    android:id="@+id/textView5"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Millaje"
+                    android:textSize="14sp"
+                    android:layout_marginTop="20dp"
+                    android:layout_marginStart="32dp"/>
+            <EditText
+                    android:id="@+id/editTextMilleage"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:hint="000000"
+                    android:textSize="14sp"
+                    android:inputType="number"
+                    android:layout_marginTop="12dp"
+                    android:layout_marginStart="32dp"
+                    android:layout_marginEnd="32dp"/>
+            <TextView
+                    android:id="@+id/textView3"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Año"
+                    android:textSize="14sp"
+                    android:layout_marginStart="32dp"
+                    android:layout_marginTop="20dp"/>
+            <EditText
+                    android:id="@+id/editTextYear"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:hint="0000"
+                    android:textSize="14sp"
+                    android:inputType="number"
+                    android:layout_marginStart="32dp"
+                    android:layout_marginEnd="32dp"
+                    android:layout_marginTop="12dp"
+            />
+        </LinearLayout>
+    </ScrollView>
     <Button
             android:id="@+id/buttonback"
             android:layout_width="66dp"
@@ -24,7 +112,7 @@
 
     <!-- Botón Guardar -->
     <Button
-            android:id="@+id/button2"
+            android:id="@+id/buttonGuardar"
             android:layout_width="wrap_content"
             android:layout_height="49dp"
             android:text="Guardar"
@@ -32,7 +120,7 @@
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             android:layout_marginTop="16dp"
-            android:layout_marginEnd="16dp"/>
+            android:layout_marginEnd="16dp" android:onClick="guardarVehiculo"/>
 
     <!-- Imagen (icono de cámara) -->
     <ImageView
@@ -40,10 +128,10 @@
             android:layout_width="100dp"
             android:layout_height="100dp"
             android:src="@android:drawable/ic_menu_camera"
-            app:layout_constraintTop_toBottomOf="@id/button2"
+            app:layout_constraintTop_toBottomOf="@id/buttonGuardar"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
-            android:layout_marginTop="40dp"/>
+            android:layout_marginTop="40dp" android:scaleType="centerCrop"/>
 
     <!-- Botón agregar imagen -->
     <Button
@@ -57,93 +145,10 @@
             app:layout_constraintEnd_toEndOf="parent"
             android:layout_marginTop="16dp"/>
 
-    <!-- Label: Vehicul actual -->
-    <TextView
-            android:id="@+id/textView2"
+
+    <androidx.constraintlayout.widget.Guideline
+            android:orientation="horizontal"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Vehicul actual"
-            android:textSize="14sp"
-            app:layout_constraintTop_toBottomOf="@id/btnPickImageGallery"
-            app:layout_constraintStart_toStartOf="parent"
-            android:layout_marginTop="32dp"
-            android:layout_marginStart="32dp"/>
-
-    <!-- Spinner Marca -->
-    <Spinner
-            android:id="@+id/spinnerMarca"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            app:layout_constraintTop_toBottomOf="@id/textView2"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            android:layout_marginTop="8dp"
-            android:layout_marginStart="32dp"
-            android:layout_marginEnd="32dp"/>
-
-    <!-- Spinner Modelo -->
-    <Spinner
-            android:id="@+id/spinnerModelo"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            app:layout_constraintTop_toBottomOf="@id/spinnerMarca"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            android:layout_marginTop="8dp"
-            android:layout_marginStart="32dp"
-            android:layout_marginEnd="32dp"/>
-
-    <!-- Label: Tablilla -->
-    <TextView
-            android:id="@+id/textView4"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Tablilla"
-            android:textSize="14sp"
-            app:layout_constraintTop_toBottomOf="@id/spinnerModelo"
-            app:layout_constraintStart_toStartOf="parent"
-            android:layout_marginTop="24dp"
-            android:layout_marginStart="32dp"/>
-
-    <!-- Input: Tablilla -->
-    <EditText
-            android:id="@+id/editTextText"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:hint="940-956"
-            android:textSize="14sp"
-            android:inputType="text"
-            app:layout_constraintTop_toBottomOf="@id/textView4"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            android:layout_marginStart="32dp"
-            android:layout_marginEnd="32dp"
-            android:layout_marginTop="8dp"/>
-
-    <!-- Label: Millaje -->
-    <TextView
-            android:id="@+id/textView5"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Millaje"
-            android:textSize="14sp"
-            app:layout_constraintTop_toBottomOf="@id/editTextText"
-            app:layout_constraintStart_toStartOf="parent"
-            android:layout_marginTop="24dp"
-            android:layout_marginStart="32dp"/>
-
-    <!-- Input: Millaje -->
-    <EditText
-            android:id="@+id/editTextText3"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:hint="000000"
-            android:textSize="14sp"
-            android:inputType="number"
-            app:layout_constraintTop_toBottomOf="@id/textView5"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            android:layout_marginTop="8dp"
-            android:layout_marginStart="32dp"
-            android:layout_marginEnd="32dp"/>
+            android:layout_height="wrap_content" android:id="@+id/guideline2"
+            app:layout_constraintGuide_begin="290dp"/>
 </androidx.constraintlayout.widget.ConstraintLayout>

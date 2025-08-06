@@ -6,11 +6,12 @@ import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.view.View;
 
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import java.io.InputStream;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -24,22 +25,23 @@ public class GarageActivity extends AppCompatActivity {
     AutoAdapter adapter;
     String userEmail;
 
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_garage);
 
-        // 1. Recibir email del usuario logueado
+        // Obtener el email del usuario autenticado
         userEmail = getIntent().getStringExtra("email");
 
         recyclerView = findViewById(R.id.recyclerViewAutos);
         recyclerView.setLayoutManager(new GridLayoutManager(this, 2));
         autos = new ArrayList<>();
 
-        // 2. Cargar autos desde base de datos
+        // Cargar autos desde la base de datos según el email
         cargarAutosDesdeBD(userEmail);
 
-        // 3. Configurar adaptador
+        // Configurar adaptador
         adapter = new AutoAdapter(autos);
         recyclerView.setAdapter(adapter);
 
@@ -49,7 +51,7 @@ public class GarageActivity extends AppCompatActivity {
                 Intent intent = new Intent(GarageActivity.this, DetalleAuto.class);
                 intent.putExtra("nombre", auto.getNombre());
                 intent.putExtra("tablilla", auto.getTablilla());
-                intent.putExtra("imagen", auto.getImagenResId()); // Si estás usando BLOB, aquí deberías pasar el bitmap
+                intent.putExtra("imagenBitmap", auto.getImagenBitmap()); // Bitmap
                 startActivity(intent);
             }
         });
@@ -61,7 +63,7 @@ public class GarageActivity extends AppCompatActivity {
             Connection connection = myJDBC.obtenerConexion();
 
             if (connection != null) {
-                String query = "SELECT BRAND, MODEL, LICENSE_PLATE, IMAGEN FROM AUTO WHERE USUARIO_EMAIL = ?";
+                String query = "SELECT BRAND, MODEL, LICENSE_PLATE, IMAGEN FROM VEHICULO WHERE EMAIL = ?";
                 PreparedStatement statement = connection.prepareStatement(query);
                 statement.setString(1, email);
                 ResultSet rs = statement.executeQuery();
@@ -71,24 +73,21 @@ public class GarageActivity extends AppCompatActivity {
                     String modelo = rs.getString("MODEL");
                     String tablilla = rs.getString("LICENSE_PLATE");
 
-                    // Combinar marca y modelo para formar el "nombre"
+                    // Combinar marca y modelo en "nombre"
                     String nombre = marca + " " + modelo;
 
-                    // Imagen (opcional: aquí puede ir BLOB o imagen local)
+                    // Obtener imagen como BLOB
                     byte[] imagenBytes = rs.getBytes("IMAGEN");
                     Bitmap bitmap = null;
-                    if (imagenBytes != null) {
+                    if (imagenBytes != null && imagenBytes.length > 0) {
                         bitmap = BitmapFactory.decodeByteArray(imagenBytes, 0, imagenBytes.length);
                     }
 
-                    // Si usas un constructor con ID de imagen (local):
-                    autos.add(new Auto(nombre, tablilla, R.drawable.default_car_image));
-
-                    // Si usas un constructor con Bitmap (requiere modificar tu clase Auto y Adapter):
-                    // autos.add(new Auto(nombre, tablilla, bitmap));
+                    // Agregar a la lista
+                    autos.add(new Auto(nombre, tablilla, bitmap));
                 }
 
-                rs.close();
+
                 statement.close();
                 connection.close();
             }
@@ -97,11 +96,11 @@ public class GarageActivity extends AppCompatActivity {
         }
     }
 
-
     public void handleCrearAuto(View v) {
         Intent i = new Intent(this, AddCar.class);
-        i.putExtra("email", userEmail); // Importante para guardar carro con el usuario actual
+        i.putExtra("email", userEmail); // Pasar email al formulario de nuevo auto
         startActivity(i);
     }
 }
+
 
