@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        android:orientation="vertical"
+        android:padding="8dp"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@drawable/border"
+        android:gravity="center">
+
+    <ImageView
+            android:id="@+id/imageAuto"
+            android:layout_width="120dp"
+            android:layout_height="100dp"
+            android:scaleType="centerCrop" />
+
+    <TextView
+            android:id="@+id/textNombre"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Honda Civic"
+            android:textStyle="bold"
+            android:gravity="center" android:textSize="10sp"/>
+
+    <TextView
+            android:id="@+id/textTablilla"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Tablilla ABC-123"
+            android:gravity="center" android:textSize="10sp"/>
+</LinearLayout>
