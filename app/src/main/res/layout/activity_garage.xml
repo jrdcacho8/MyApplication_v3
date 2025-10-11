@@ -7,7 +7,7 @@
     <TextView
             android:text="Garaje"
             android:layout_width="176dp"
-            android:layout_height="45dp" android:id="@+id/textView"
+            android:layout_height="45dp" android:id="@+id/txtGarageName"
             app:layout_constraintStart_toStartOf="parent" app:layout_constraintTop_toTopOf="parent"
             android:layout_marginTop="16dp" android:layout_marginStart="16dp"
             android:textSize="20sp"
@@ -18,16 +18,17 @@
             android:layout_height="566dp"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintBottom_toTopOf="@+id/guideline6" app:layout_constraintTop_toTopOf="@+id/guideline5"/>
+            app:layout_constraintBottom_toTopOf="@+id/guideline6" app:layout_constraintTop_toTopOf="@+id/guideline5"
+            app:layout_constraintHorizontal_bias="0.337" app:layout_constraintVertical_bias="0.734"/>
     <ImageButton
-            android:layout_width="42dp"
-            android:layout_height="43dp" app:srcCompat="@android:drawable/ic_menu_add"
+            android:layout_width="68dp"
+            android:layout_height="52dp" app:srcCompat="@android:drawable/ic_menu_add"
             android:id="@+id/imageButton"
             android:background="@android:color/transparent"
             android:onClick="handleCrearAuto"
             app:layout_constraintTop_toTopOf="parent"
             android:layout_marginTop="16dp" android:layout_marginEnd="16dp" app:layout_constraintEnd_toEndOf="parent"
-    />
+            android:contentDescription="'Añadir'"/>
     <androidx.constraintlayout.widget.Guideline android:layout_width="wrap_content" android:layout_height="wrap_content"
                                                 android:id="@+id/guideline5"
                                                 android:orientation="horizontal"

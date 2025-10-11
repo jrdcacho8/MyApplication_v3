@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        xmlns:tools="http://schemas.android.com/tools" android:layout_width="match_parent"
+        android:layout_height="match_parent">
+    <androidx.recyclerview.widget.RecyclerView
+            android:layout_width="350dp"
+            android:layout_height="566dp"
+            android:id="@+id/recyclerViewMaintenance"
+            android:scrollbarAlwaysDrawVerticalTrack="true"
+            app:layout_constraintTop_toTopOf="parent"
+            android:layout_marginTop="105dp" app:layout_constraintBottom_toBottomOf="parent"
+            android:layout_marginBottom="60dp" app:layout_constraintStart_toStartOf="parent"
+            android:layout_marginStart="30dp" android:layout_marginEnd="31dp"
+            app:layout_constraintEnd_toEndOf="parent" android:longClickable="false"/>
+    <androidx.constraintlayout.widget.Guideline
+            android:layout_width="wrap_content" android:layout_height="wrap_content"
+            android:id="@+id/guideline5"
+            android:orientation="horizontal"
+            app:layout_constraintGuide_percent="0.21"/>
+    <androidx.constraintlayout.widget.Guideline
+            android:layout_width="wrap_content" android:layout_height="wrap_content"
+            android:id="@+id/guideline6"
+            android:orientation="horizontal"
+            app:layout_constraintGuide_percent="0.85"
+            android:contentDescription="'return'"/>
+
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:contentDescription="'return'"
+            android:clickable="true" app:srcCompat="@drawable/back_button" android:id="@+id/buttonBackGarage"
+            app:layout_constraintEnd_toStartOf="@+id/textActivityMaintenance"
+            app:layout_constraintStart_toStartOf="parent" app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent" app:layout_constraintHorizontal_bias="0.301"
+            app:layout_constraintVertical_bias="0.023" app:backgroundTint="@color/design_default_color_on_primary"/>
+    <TextView
+            android:text="Mantenimientos"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content" android:id="@+id/textActivityMaintenance"
+            app:layout_constraintEnd_toStartOf="@+id/buttonBackGarage"
+            app:layout_constraintStart_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent" android:layout_marginTop="24dp"
+            android:layout_marginStart="8dp"
+            android:layout_marginEnd="8dp"
+            android:textSize="16sp"
+            android:textAlignment="center"/>
+</androidx.constraintlayout.widget.ConstraintLayout>

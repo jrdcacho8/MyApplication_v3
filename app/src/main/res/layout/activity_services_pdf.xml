@@ -1,0 +1,194 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:padding="16dp"
+            android:background="#F5F5F5">
+
+    <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+        <!-- Título -->
+        <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Formulario de Mantenimiento"
+                android:textSize="24sp"
+                android:textStyle="bold"
+                android:textColor="#333"
+                android:gravity="center"
+                android:layout_marginBottom="24dp"/>
+
+        <!-- Card Container -->
+        <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:background="@android:color/white"
+                android:padding="16dp"
+                android:elevation="4dp">
+
+            <!-- Vehículo -->
+            <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Información del Vehículo"
+                    android:textStyle="bold"
+                    android:textColor="#555"
+                    android:layout_marginBottom="8dp"/>
+
+            <EditText
+                    android:id="@+id/etVehiculo"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:hint="Modelo del vehículo"
+                    android:inputType="text"
+                    android:padding="12dp"
+                    android:background="@android:drawable/edit_text"
+                    android:layout_marginBottom="12dp"/>
+
+            <EditText
+                    android:id="@+id/etTablilla"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:hint="Tablilla (ABC-123)"
+                    android:inputType="textCapCharacters"
+                    android:padding="12dp"
+                    android:background="@android:drawable/edit_text"
+                    android:layout_marginBottom="24dp"/>
+
+            <!-- Tipo de Mantenimiento -->
+            <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Tipo de Mantenimiento"
+                    android:textStyle="bold"
+                    android:textColor="#555"
+                    android:layout_marginBottom="8dp"/>
+
+            <Spinner
+                    android:id="@+id/spinnerTipo"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:padding="12dp"
+                    android:layout_marginBottom="24dp"/>
+
+            <!-- Fecha -->
+            <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Fecha del Servicio"
+                    android:textStyle="bold"
+                    android:textColor="#555"
+                    android:layout_marginBottom="8dp"/>
+
+            <Button
+                    android:id="@+id/btnSeleccionarFecha"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Seleccionar Fecha"
+                    android:textColor="@android:color/white"
+                    android:background="#2196F3"
+                    android:layout_marginBottom="8dp"/>
+
+            <TextView
+                    android:id="@+id/tvFechaSeleccionada"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Fecha no seleccionada"
+                    android:textColor="#888"
+                    android:layout_marginBottom="24dp"/>
+
+            <!-- Compañía -->
+            <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Compañía/Taller"
+                    android:textStyle="bold"
+                    android:textColor="#555"
+                    android:layout_marginBottom="8dp"/>
+
+            <EditText
+                    android:id="@+id/etCompania"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:hint="Nombre del taller"
+                    android:inputType="text"
+                    android:padding="12dp"
+                    android:background="@android:drawable/edit_text"
+                    android:layout_marginBottom="24dp"/>
+
+            <!-- Costo -->
+            <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Costo del Servicio"
+                    android:textStyle="bold"
+                    android:textColor="#555"
+                    android:layout_marginBottom="8dp"/>
+
+            <EditText
+                    android:id="@+id/etCosto"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:hint="$0.00"
+                    android:inputType="numberDecimal"
+                    android:padding="12dp"
+                    android:background="@android:drawable/edit_text"
+                    android:layout_marginBottom="24dp"/>
+
+            <!-- Recibo -->
+            <Button
+                    android:id="@+id/btnSubirRecibo"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Subir Recibo"
+                    android:textColor="@android:color/white"
+                    android:background="#FF9800"
+                    android:layout_marginBottom="24dp"/>
+
+            <!-- Errores -->
+            <TextView
+                    android:id="@+id/tvErrores"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:textColor="#D32F2F"
+                    android:padding="12dp"
+                    android:background="#FFEBEE"
+                    android:visibility="gone"
+                    android:layout_marginBottom="16dp"/>
+
+            <!-- Botones de acción -->
+            <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:weightSum="2">
+
+                <Button
+                        android:id="@+id/btnLimpiar"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="Limpiar"
+                        android:textColor="@android:color/white"
+                        android:background="#757575"
+                        android:layout_marginEnd="8dp"/>
+
+                <Button
+                        android:id="@+id/btnGuardar"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="Guardar Servicio"
+                        android:textColor="@android:color/white"
+                        android:background="#4CAF50"
+                        android:layout_marginStart="8dp"/>
+            </LinearLayout>
+
+        </LinearLayout>
+
+    </LinearLayout>
+</ScrollView>

@@ -12,10 +12,13 @@ import java.util.List;
 
 public class AutoAdapter extends RecyclerView.Adapter<AutoAdapter.AutoViewHolder> {
 
-    private List<Auto> listaAutos;
+    private List<Vehicle> listaAutos;
 
-    public AutoAdapter(List<Auto> listaAutos) {
+    public String userEmail;
+
+    public AutoAdapter(List<Vehicle> listaAutos, String userEmail) {
         this.listaAutos = listaAutos;
+        this.userEmail= userEmail;
     }
 
     @NonNull
@@ -29,12 +32,15 @@ public class AutoAdapter extends RecyclerView.Adapter<AutoAdapter.AutoViewHolder
 
     @Override
     public void onBindViewHolder(@NonNull AutoViewHolder holder, int position) {
-        Auto auto = listaAutos.get(position);
-        holder.nombre.setText(auto.getNombre());
-        holder.tablilla.setText("Tablilla " + auto.getTablilla());
-        holder.imagen.setImageBitmap(auto.getImagenBitmap());
+        Vehicle auto = listaAutos.get(position);
 
-        holder.itemView.setTag(auto);  // <- Aquí se guarda el objeto Auto
+        holder.nombre.setText(auto.getBrand());
+        holder.tablilla.setText("Tablilla " + auto.getLicense_plate());
+        holder.imagen.setImageBitmap(auto.getImageBitmap());
+
+        holder.itemView.setTag(R.id.tag_vehicle, auto);
+        holder.itemView.setTag(R.id.tag_user_email, userEmail);
+
     }
 
 
@@ -43,7 +49,8 @@ public class AutoAdapter extends RecyclerView.Adapter<AutoAdapter.AutoViewHolder
         return listaAutos.size();
     }
     public interface OnItemClickListener {
-        void onItemClick(Auto auto);
+        void onItemClick(Vehicle auto, String email);
+        void onItemClick(Vehicle auto);
     }
 
     private OnItemClickListener listener;
@@ -70,7 +77,11 @@ public class AutoAdapter extends RecyclerView.Adapter<AutoAdapter.AutoViewHolder
                 public void onClick(View v) {
                     int position = getAdapterPosition();
                     if (listener != null && position != RecyclerView.NO_POSITION) {
-                        listener.onItemClick((Auto) v.getTag());
+                        Vehicle vehicle = (Vehicle) v.getTag(R.id.tag_vehicle);
+                        String email = (String) v.getTag(R.id.tag_user_email);
+
+                        // Llamar al listener con los objetos recuperados
+                        listener.onItemClick(vehicle, email);
                     }
                 }
             });

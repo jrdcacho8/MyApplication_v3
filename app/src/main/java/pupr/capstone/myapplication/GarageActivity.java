@@ -6,8 +6,7 @@ import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.view.View;
 
-import androidx.activity.result.ActivityResultLauncher;
-import androidx.activity.result.contract.ActivityResultContracts;
+import android.widget.TextView;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -15,13 +14,15 @@ import androidx.recyclerview.widget.RecyclerView;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
 public class GarageActivity extends AppCompatActivity {
-
+    //Trabajr codigo para que utilice arreglo de objetpos en vez de base de dato
     RecyclerView recyclerView;
-    List<Auto> autos;
+
+    List<Vehicle> autos;
     AutoAdapter adapter;
     String userEmail;
 
@@ -32,8 +33,18 @@ public class GarageActivity extends AppCompatActivity {
         setContentView(R.layout.activity_garage);
 
         // Obtener el email del usuario autenticado
-        userEmail = getIntent().getStringExtra("email");
 
+        userEmail = getIntent().getStringExtra("email");
+        //obtener nombre de usuario  para identificar garaje
+
+        try {
+            setGarageName(userEmail);
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+
+
+        // Change it here
         recyclerView = findViewById(R.id.recyclerViewAutos);
         recyclerView.setLayoutManager(new GridLayoutManager(this, 2));
         autos = new ArrayList<>();
@@ -42,17 +53,27 @@ public class GarageActivity extends AppCompatActivity {
         cargarAutosDesdeBD(userEmail);
 
         // Configurar adaptador
-        adapter = new AutoAdapter(autos);
+        adapter = new AutoAdapter(autos, userEmail);
         recyclerView.setAdapter(adapter);
+
 
         adapter.setOnItemClickListener(new AutoAdapter.OnItemClickListener() {
             @Override
-            public void onItemClick(Auto auto) {
-                Intent intent = new Intent(GarageActivity.this, DetalleAuto.class);
-                intent.putExtra("nombre", auto.getNombre());
-                intent.putExtra("tablilla", auto.getTablilla());
-                intent.putExtra("imagenBitmap", auto.getImagenBitmap()); // Bitmap
+            public void onItemClick(Vehicle autos, String userEmail) {
+
+                Intent intent = new Intent(GarageActivity.this, MaintenanceActivity.class);
+                intent.putExtra("marca", autos.getBrand());
+                intent.putExtra("license_plate", autos.getLicense_plate());
+                intent.putExtra("model", autos.getModel());
+                intent.putExtra("email", userEmail);
+
+
                 startActivity(intent);
+            }
+
+            @Override
+            public void onItemClick(Vehicle auto) {
+
             }
         });
     }
@@ -84,7 +105,7 @@ public class GarageActivity extends AppCompatActivity {
                     }
 
                     // Agregar a la lista
-                    autos.add(new Auto(nombre, tablilla, bitmap));
+                    autos.add(new Vehicle(nombre, tablilla, bitmap));
                 }
 
 
@@ -101,6 +122,41 @@ public class GarageActivity extends AppCompatActivity {
         i.putExtra("email", userEmail); // Pasar email al formulario de nuevo auto
         startActivity(i);
     }
+
+    public void setGarageName(String email) throws SQLException {
+        MyJDBC myJDBC1 = new MyJDBC();
+
+        // Assuming obtenerConexion() is handled and throws exceptions correctly
+
+        try (Connection connection = myJDBC1.obtenerConexion()) {
+            if (connection != null) {
+                // Correct SELECT query syntax with a WHERE clause
+                String query = "SELECT NAME FROM USUARIO WHERE EMAIL = ?";
+
+                // Use try-with-resources for PreparedStatement too
+                try (PreparedStatement stmt = connection.prepareStatement(query)) {
+                    // Bind the input parameter, not the result variable
+                    stmt.setString(1, email);
+
+                    // Use executeQuery() for SELECT statements
+                    try (ResultSet rs = stmt.executeQuery()) {
+                        if (rs.next()) {
+                            // Extract the value from the ResultSet
+                            String garage_name = rs.getString("NAME");
+
+                            int firstSpaceIndex = garage_name.indexOf(" ");
+                            String userName = garage_name.substring(0, firstSpaceIndex);
+                            TextView garage_owner = findViewById(R.id.txtGarageName);
+                            garage_owner.setText(String.format("Garaje de %s", userName));
+                        }
+                    }
+                }
+            }
+        } // connection and stmt are automatically closed here
+    }
 }
+
+
+
 
 

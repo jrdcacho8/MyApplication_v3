@@ -1,0 +1,131 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+              android:layout_width="match_parent"
+              android:layout_height="match_parent"
+              android:orientation="vertical"
+              android:padding="16dp"
+              android:background="#F5F5F5">
+    <!-- Título -->
+    <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Selector de Fechas"
+            android:textSize="24sp"
+            android:textStyle="bold"
+            android:textColor="#333"
+            android:gravity="center"
+            android:layout_marginBottom="16dp"/>
+    <!-- Card del calendario -->
+    <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:orientation="vertical"
+            android:background="@android:color/white"
+            android:padding="16dp"
+            android:elevation="4dp">
+        <!-- Controles de modo -->
+        <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:layout_marginBottom="16dp">
+            <Button
+                    android:id="@+id/btnModoSingle"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="Fecha Única"
+                    android:textColor="@android:color/white"
+                    android:background="#2196F3"
+                    android:layout_marginEnd="8dp"/>
+            <Button
+                    android:id="@+id/btnModoRange"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="Rango de Fechas"
+                    android:textColor="@android:color/white"
+                    android:background="#757575"
+                    android:layout_marginStart="8dp"/>
+        </LinearLayout>
+        <!-- Navegación del calendario -->
+        <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center_vertical"
+                android:layout_marginBottom="16dp">
+            <Button
+                    android:id="@+id/btnAnterior"
+                    android:layout_width="48dp"
+                    android:layout_height="48dp"
+                    android:text="◄"
+                    android:textSize="18sp"
+                    android:background="#E0E0E0"/>
+            <TextView
+                    android:id="@+id/tvMesAño"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="Octubre 5"
+                    android:textSize="20sp"
+                    android:textStyle="bold"
+                    android:textColor="#333"
+                    android:gravity="center"/>
+            <Button
+                    android:id="@+id/btnSiguiente"
+                    android:layout_width="48dp"
+                    android:layout_height="48dp"
+                    android:text="►"
+                    android:textSize="18sp"
+                    android:background="#E0E0E0"/>
+        </LinearLayout>
+        <Button
+                android:id="@+id/btnHoy"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Ir a Hoy"
+                android:textColor="@android:color/white"
+                android:background="#FF9800"
+                android:layout_marginBottom="16dp"/>
+        <!-- Grid del calendario -->
+        <ScrollView
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_weight="1">
+            <GridLayout
+                    android:id="@+id/gridCalendario"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:columnCount="7"
+                    android:background="#FAFAFA"
+                    android:padding="8dp"/>
+        </ScrollView>
+        <!-- Fecha seleccionada -->
+        <TextView
+                android:id="@+id/tvFechaSeleccionada"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Fecha seleccionada: N/A"
+                android:textSize="16sp"
+                android:textColor="#2196F3"
+                android:textStyle="bold"
+                android:gravity="center"
+                android:padding="12dp"
+                android:background="#E3F2FD"
+                android:layout_marginTop="16dp"
+                android:visibility="gone"/>
+        <!-- Botón confirmar -->
+        <Button
+                android:id="@+id/btnConfirmar"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Confirmar Selección"
+                android:textColor="@android:color/white"
+                android:background="#4CAF50"
+                android:layout_marginTop="16dp"
+                android:textSize="16sp"
+                android:textStyle="bold"/>
+    </LinearLayout>
+</LinearLayout>

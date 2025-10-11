@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <item name="tag_vehicle" type="id"/>
+    <item name="tag_user_email" type="id"/>
+    <item name="tag_maintenance" type="id"/>
+</resources>

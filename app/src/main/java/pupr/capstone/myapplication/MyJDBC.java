@@ -16,12 +16,21 @@ public class MyJDBC {
 
     public Connection obtenerConexion() {
 
-        ip = "192.168.0.32";
+        /*
+        ip = "192.168.0.3";
         port = "3306";
         database = "Test";
         uname = "root";
         pass = "Eecf#0819";
+        */
 
+        ip = "10.0.0.64";
+        port = "3306";
+        database = "Test";
+        uname = "root";
+        pass = "C@pstoneAJE3";
+        //php -Que es un api (intermediario entre applicación)
+        //firebase sera un api?
         StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
         StrictMode.setThreadPolicy(policy);
         Connection connection = null;

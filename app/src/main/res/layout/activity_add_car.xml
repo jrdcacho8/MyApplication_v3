@@ -9,108 +9,113 @@
         tools:context=".AddCar">
 
     <!-- Botón Volver -->
+
+    <!-- Botón Guardar -->
     <ScrollView
             android:layout_width="0dp"
-            android:layout_height="0dp" app:layout_constraintTop_toTopOf="@+id/guideline2"
+            android:layout_height="1900dp" app:layout_constraintTop_toTopOf="@+id/guideline2"
             app:layout_constraintBottom_toBottomOf="parent" app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent">
+            app:layout_constraintStart_toStartOf="parent" android:id="@+id/scrollView3"
+            app:layout_constraintHorizontal_bias="0.0" app:layout_constraintVertical_bias="0.225">
         <LinearLayout
                 android:orientation="vertical"
                 android:layout_width="match_parent"
-                android:layout_height="match_parent">
+                android:layout_height="match_parent" android:id="@+id/layoutSelections">
             <TextView
                     android:id="@+id/textView2"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Vehicul actual"
-                    android:textSize="14sp"
+                    android:text="Vehículo Actual"
+                    android:textSize="20sp"
                     android:layout_marginTop="32dp"
                     android:layout_marginStart="32dp"/>
             <Spinner
                     android:id="@+id/spinnerMarca"
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
+                    android:layout_height="49dp"
                     android:layout_marginTop="8dp"
                     android:layout_marginStart="32dp"
                     android:layout_marginEnd="32dp"/>
             <Spinner
                     android:id="@+id/spinnerModelo"
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
+                    android:layout_height="49dp"
                     android:layout_marginTop="8dp"
                     android:layout_marginStart="32dp"
                     android:layout_marginEnd="32dp"/>
             <TextView
-                    android:id="@+id/textView4"
-                    android:layout_width="wrap_content"
+                    android:id="@+id/lblLicensePlate"
+                    android:layout_width="92dp"
                     android:layout_height="wrap_content"
                     android:text="Tablilla"
-                    android:textSize="14sp"
+                    android:textSize="20sp"
                     android:layout_marginStart="32dp"
                     android:layout_marginTop="20dp"/>
             <EditText
                     android:id="@+id/editTextLicensePlate"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
+                    android:layout_width="398dp"
+                    android:layout_height="48dp"
                     android:hint="000-000"
-                    android:textSize="14sp"
+                    android:textSize="16sp"
                     android:inputType="text"
                     android:layout_marginStart="32dp"
                     android:layout_marginEnd="32dp"
                     android:layout_marginTop="12dp"/>
             <TextView
-                    android:id="@+id/textView5"
-                    android:layout_width="wrap_content"
+                    android:id="@+id/lblMilleage"
+                    android:layout_width="95dp"
                     android:layout_height="wrap_content"
                     android:text="Millaje"
-                    android:textSize="14sp"
+                    android:textSize="20sp"
                     android:layout_marginTop="20dp"
                     android:layout_marginStart="32dp"/>
             <EditText
                     android:id="@+id/editTextMilleage"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
+                    android:layout_width="395dp"
+                    android:layout_height="62dp"
                     android:hint="000000"
-                    android:textSize="14sp"
+                    android:textSize="16sp"
                     android:inputType="number"
                     android:layout_marginTop="12dp"
                     android:layout_marginStart="32dp"
                     android:layout_marginEnd="32dp"/>
             <TextView
-                    android:id="@+id/textView3"
-                    android:layout_width="wrap_content"
+                    android:id="@+id/lblYear"
+                    android:layout_width="98dp"
                     android:layout_height="wrap_content"
                     android:text="Año"
-                    android:textSize="14sp"
+                    android:textSize="20sp"
                     android:layout_marginStart="32dp"
                     android:layout_marginTop="20dp"/>
             <EditText
                     android:id="@+id/editTextYear"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
+                    android:layout_width="399dp"
+                    android:layout_height="57dp"
                     android:hint="0000"
-                    android:textSize="14sp"
+                    android:textSize="16sp"
                     android:inputType="number"
                     android:layout_marginStart="32dp"
                     android:layout_marginEnd="32dp"
                     android:layout_marginTop="12dp"
             />
+            <TextView
+                    android:id="@+id/lblColor"
+                    android:layout_width="107dp"
+                    android:layout_height="wrap_content"
+                    android:text="Color"
+                    android:textSize="20sp"
+                    android:layout_marginStart="32dp"
+                    android:layout_marginTop="20dp"/>
+            <Spinner
+                    android:id="@+id/spinnerColor"
+                    android:layout_width="match_parent"
+                    android:layout_height="45dp"
+                    android:layout_marginTop="8dp"
+                    android:layout_marginStart="32dp"
+                    android:layout_marginEnd="32dp"/>
+
         </LinearLayout>
     </ScrollView>
-    <Button
-            android:id="@+id/buttonback"
-            android:layout_width="66dp"
-            android:layout_height="52dp"
-            android:text="←"
-            android:background="@android:color/transparent"
-            android:textColor="@android:color/black"
-            android:textSize="20sp"
-            android:onClick="goBack"
-            app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-    />
-
-    <!-- Botón Guardar -->
     <Button
             android:id="@+id/buttonGuardar"
             android:layout_width="wrap_content"
@@ -145,10 +150,20 @@
             app:layout_constraintEnd_toEndOf="parent"
             android:layout_marginTop="16dp"/>
 
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:clickable="true" app:srcCompat="@drawable/back_button" android:id="@+id/btnBackMaintenance"
+            app:layout_constraintEnd_toStartOf="@+id/buttonGuardar"
+            app:layout_constraintStart_toStartOf="parent" app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintHorizontal_bias="0.064" app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintVertical_bias="0.037" android:contentDescription="'Back'"/>
 
     <androidx.constraintlayout.widget.Guideline
             android:orientation="horizontal"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content" android:id="@+id/guideline2"
-            app:layout_constraintGuide_begin="290dp"/>
+            android:layout_height="40dp" android:id="@+id/guideline2"
+            app:layout_constraintGuide_begin="648dp" app:layout_constraintBottom_toBottomOf="parent"
+            android:layout_marginBottom="1622dp"/>
+
 </androidx.constraintlayout.widget.ConstraintLayout>

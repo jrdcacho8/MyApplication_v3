@@ -8,7 +8,7 @@ android {
 
     defaultConfig {
         applicationId = "pupr.capstone.myapplication"
-        minSdk = 24
+        minSdk = 26
         targetSdk = 35
         versionCode = 1
         versionName = "1.0"
@@ -38,8 +38,11 @@ dependencies {
     implementation("androidx.constraintlayout:constraintlayout:2.1.4")
     implementation("androidx.navigation:navigation-fragment:2.6.0")
     implementation("androidx.navigation:navigation-ui:2.6.0")
+    implementation("com.google.firebase:firebase-auth:24.0.1")
     testImplementation("junit:junit:4.13.2")
     androidTestImplementation("androidx.test.ext:junit:1.1.5")
     androidTestImplementation("androidx.test.espresso:espresso-core:3.5.1")
-    implementation(files("lib/mysql-connector-java-5.1.49.jar"))
+    implementation ("mysql:mysql-connector-java:5.1.49")
+
+
 }
