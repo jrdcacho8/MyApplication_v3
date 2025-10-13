@@ -51,7 +51,7 @@ public class MaintenanceActivity extends AppCompatActivity {
 
         //Set Title of activity_maintenance according to selected vehicle
 
-        textActivityMaintenance.setText(marca + "" + model+ "" + license_plate);
+        textActivityMaintenance.setText(String.join(" ", marca, license_plate));
 
         // Cargar mantenimientos de la BD usando la marca como nombre de tabla
         cargarMantenimientosDesdeBD(marca);

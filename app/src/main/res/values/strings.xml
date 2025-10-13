@@ -1,3 +1,4 @@
+<?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">MyApplication</string>
     <string name="action_settings">Settings</string>
@@ -38,4 +39,17 @@
         dictum libero quis erat maximus, vitae volutpat diam dignissim.
     </string>
     <string name="garaje">\'Garaje\'</string>
+    <string name="navigation_report_cd"/>
+    <string name="navigation_profile_cd"/>
+    <string name="navigation_garage_cd"/>
+    <string name="navigation_tips_cd"/>
+    <string name="add_car_label"/>
+    <string name="add_new_vehicle_cd"/>
+    <string name="garage_title"/>
+    <string name="button_create_account"/>
+    <string name="initial_image_cd"/>
+    <string name="screen_title_al_dia"/>
+    <string name="hint_email"/>
+    <string name="hint_password"/>
+    <string name="button_access"/>
 </resources>

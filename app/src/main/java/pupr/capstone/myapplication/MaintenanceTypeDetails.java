@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.icu.text.SimpleDateFormat;
 import android.os.Build;
 import android.os.Bundle;
+import android.view.View;
 import android.widget.*;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import androidx.appcompat.app.AppCompatActivity;
@@ -16,9 +17,9 @@ import java.util.Locale;
 
 public class MaintenanceTypeDetails extends AppCompatActivity {
     private ImageView imageMaintenance;
-    private TextView txtTitle;           // "Mantenimientos"
-    private TextView maintenanceName;    // "Tipo de mantenimiento"
-    private TextView txtNote;            // "Nota Educativa del Mantenimiento"
+
+    private TextView maintenanceName;
+    private TextView txtNote,lblLastMaintenance,txtTitle;            // "Nota Educativa del Mantenimiento",Tipo de mantenimiento",Mantenimientos"
     private EditText txtLastDateMaintenance, txtNextMaintenance;
     private Button btnUpdate;
     private FloatingActionButton backButton, editButton;
@@ -29,7 +30,7 @@ public class MaintenanceTypeDetails extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.maintenance_screen); // usa el nombre real de TU XML
-
+        //checkAlertDTB
         // --- bind views ---
         imageMaintenance       = findViewById(R.id.imageMaintenance);
         txtTitle               = findViewById(R.id.txtTitle);
@@ -39,6 +40,7 @@ public class MaintenanceTypeDetails extends AppCompatActivity {
         btnUpdate              = findViewById(R.id.btnUpdateMaintenance);
         backButton             = findViewById(R.id.backButton);
         editButton             = findViewById(R.id.editButton);
+        lblLastMaintenance      =findViewById(R.id.lblLastMaintenance);
 
         // --- recibe extras del intent ---
         Intent intent = getIntent();
@@ -56,6 +58,41 @@ public class MaintenanceTypeDetails extends AppCompatActivity {
         String userEmail        =intent.getStringExtra("email");
 
         //recibe intent vehicle
+        // --- 🔑 New Code: Check Database for Existing Alert Date 🔑 ---
+        LocalDate existingAlertDate = null;
+        if (maintenance_type != null && car_license_plate != null && userEmail != null) {
+            try {
+
+                // Call the new method to check the database
+                existingAlertDate = getExistingAlertDate(userEmail, car_license_plate, maintenance_type);
+            } catch (Exception e) {
+                // Handle JDBC instantiation error if necessary
+                e.printStackTrace();
+            }
+        }
+
+
+        if (existingAlertDate != null) {
+            // Use the same formatter you plan to use for display
+            DateTimeFormatter output = DateTimeFormatter.ofPattern("MMM-dd-yyyy", Locale.US);
+            String formattedDate = existingAlertDate.format(output);
+
+            txtNextMaintenance.setText(formattedDate);
+
+            // OPTIONAL: Disable the update button if the alert is already set
+            lblLastMaintenance.setVisibility(View.GONE);
+            txtLastDateMaintenance.setVisibility(View.GONE);
+            btnUpdate.setEnabled(false);
+            btnUpdate.setText("Alerta Establecida");
+            Toast.makeText(this, "Alerta ya está establecida para: " + formattedDate, Toast.LENGTH_LONG).show();
+        } else {
+            // Ensure the button is enabled if no alert exists
+            btnUpdate.setEnabled(true);
+            btnUpdate.setText("Actualizar");
+        }
+
+        // ... (Rest of your onCreate methods) ...
+
 
 
 
@@ -71,7 +108,7 @@ public class MaintenanceTypeDetails extends AppCompatActivity {
 
         // DatePickers para fechas (mucho mejor que EditText con inputType)
         txtLastDateMaintenance.setOnClickListener(v -> last_maintenance_date=showDatePicker(txtLastDateMaintenance));
-       // txtNextMaintenance.setOnClickListener(v -> showDatePicker(txtNextMaintenance));
+
 
         // Botón regresar
         backButton.setOnClickListener(v -> {
@@ -91,8 +128,9 @@ public class MaintenanceTypeDetails extends AppCompatActivity {
         btnUpdate.setOnClickListener(v -> {
             String lastDate = txtLastDateMaintenance.getText().toString().trim();
             DateTimeFormatter output = DateTimeFormatter.ofPattern("MMM-dd-yyyy", Locale.US);
-            // TODO: validar formato y enviar a tu BD si aplica
-            LocalDate nextMaintenanceDate=last_maintenance_date.plusDays(daysToAdd);
+            LocalDate mantLastDate = LocalDate.parse(lastDate,output);
+
+            LocalDate nextMaintenanceDate = mantLastDate.plusDays(daysToAdd);
 
             String formattedDate = nextMaintenanceDate.format(output);
             txtNextMaintenance.setText(formattedDate);
@@ -106,16 +144,16 @@ public class MaintenanceTypeDetails extends AppCompatActivity {
 
     private LocalDate showDatePicker(EditText target) {
         // 1. Get the current date to initialize the DatePickerDialog
-        Calendar c = Calendar.getInstance();
-        int y = c.get(Calendar.YEAR);
-        int m = c.get(Calendar.MONTH); // Calendar.MONTH is 0-based (0 for January)
-        int d = c.get(Calendar.DAY_OF_MONTH);
+        Calendar selectedDate = Calendar.getInstance();
+        int y = selectedDate.get(Calendar.YEAR);
+        int m = selectedDate.get(Calendar.MONTH); // Calendar.MONTH is 0-based (0 for January)
+        int d = selectedDate.get(Calendar.DAY_OF_MONTH);
 
         // 2. Create and show the DatePickerDialog
         new DatePickerDialog(this, (view, year, month, dayOfMonth) -> {
             // 'month' is 0-based, so add 1 for the correct month number
             // and create a Calendar instance for easy formatting.
-            Calendar selectedDate = Calendar.getInstance();
+            //Calendar selectedDate = Calendar.getInstance();
             selectedDate.set(year, month, dayOfMonth);
 
             // 3. Format the date as "MMM-DD-YYYY"
@@ -170,6 +208,36 @@ public class MaintenanceTypeDetails extends AppCompatActivity {
         }
 
 
+    }
+    // --- Inside MyJDBC.java ---
+
+    public LocalDate getExistingAlertDate(String email, String licensePlate, String maintenanceType) {
+        String query = "SELECT ALERT_DATE FROM ALERT WHERE EMAIL = ? AND LICENSE_PLATE = ? AND NAME_ALERT = ?";
+        LocalDate existingDate = null;
+
+        MyJDBC jdbc = new MyJDBC();
+        java.sql.Connection con = jdbc.obtenerConexion();
+
+        try (
+             java.sql.PreparedStatement stmt = con.prepareStatement(query)) {
+
+            stmt.setString(1, email);
+            stmt.setString(2, licensePlate);
+            stmt.setString(3, maintenanceType);
+
+            try (java.sql.ResultSet rs = stmt.executeQuery()) {
+                if (rs.next()) {
+                    // Assuming ALERT_DATE is stored as a standard SQL DATE or VARCHAR
+                    String dateString = rs.getString("ALERT_DATE");
+                    // Convert the String from the DB back into a LocalDate
+                    existingDate = LocalDate.parse(dateString);
+                }
+            }
+        } catch (Exception e) {
+            // Log the error but return null so the app doesn't crash
+            e.printStackTrace();
+        }
+        return existingDate; // Returns the date or null if no alert exists
     }
 
     private int mapPictureKeyToDrawable(int key) {

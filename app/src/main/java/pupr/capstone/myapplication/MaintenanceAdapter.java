@@ -41,9 +41,6 @@ public class MaintenanceAdapter extends RecyclerView.Adapter<MaintenanceAdapter.
                 .inflate(R.layout.item_mantenimiento, parent, false);
         return new MantenimientoViewHolder(view, listener);
 
-
-
-
     }
 
     @Override

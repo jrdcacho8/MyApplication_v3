@@ -3,4 +3,5 @@
     <item name="tag_vehicle" type="id"/>
     <item name="tag_user_email" type="id"/>
     <item name="tag_maintenance" type="id"/>
+    <item name="recyclerViewAutos" type="id"/>
 </resources>

@@ -1,3 +1,15 @@
 <resources>
-      <dimen name="fab_margin">16dp</dimen>
-   </resources>
+    <dimen name="fab_margin">16dp</dimen>
+    <dimen name="margin_default">32dp</dimen>
+    <dimen name="spacing_small"/>
+    <dimen name="elevation_medium"/>
+    <dimen name="spacing_medium"/>
+    <dimen name="icon_size_large"/>
+    <dimen name="spacing_large">24dp</dimen>
+    <dimen name="margin_button_horizontal">32dp</dimen>
+    <dimen name="header_image_height"/>
+    <dimen name="text_size_large"/>
+    <dimen name="min_touch_target"/>
+    <dimen name="spacing_extra_large">76dp</dimen>
+    <dimen name="margin_input_horizontal"/>
+</resources>

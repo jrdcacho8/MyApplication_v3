@@ -64,33 +64,33 @@ public class AddCar extends AppCompatActivity {
         String[] marcas = {"Seleccione una marca", "Audi", "BMW", "Chrysler", "Dodge", "Ford", "Hyundai", "Infiniti", "Kia",
                 "Lamborghini", "Lexus", "Mazda", "Mercedes-Benz", "Mitsubishi", "Nissan", "Tesla", "Toyota", "Volkswagen", "Volvo"};
 // Lista de color
-        String[] color = {"Seleccione un color", "Amarillo", "Anaranjado", "Azul", "Beige", "Blanco", "Dorado", "Gris", "Marrón", "Negro", "Plata", "Rojo", "Verde", "Violeta"};
+        String[] color = {"Seleccione un color", "Amarillo", "Anaranjado", "Azul", "Beige", "Blanco", "Dorado", "Gris", "Marrón", "Negro", "Plata", "Rojo", "Verde", "Violeta","Other"};
 // Mapa de modelos según la marca
         Map<String, String[]> modelosPorMarca = new HashMap<>();
 
-        modelosPorMarca.put("Acura", new String[]{"ILX", "Integra", "MDX", "NSX", "RDX", "RLX", "TLX"});
-        modelosPorMarca.put("Audi", new String[]{"A3 – A8", "Q3 – Q8", "R8", "TT", "Versiones S / RS"});
-        modelosPorMarca.put("BMW", new String[]{"M3", "M4", "M5", "M8", "Serie 2 – Serie 8", "X1 – X7", "Z4"});
-        modelosPorMarca.put("Chrysler", new String[]{"300", "Pacifica", "Voyager"});
-        modelosPorMarca.put("Ford", new String[]{"Bronco", "Bronco Sport", "Edge", "Escape", "Expedition", "Explorer", "F-150", "Maverick", "Mustang", "Ranger", "Transit"});
-        modelosPorMarca.put("Honda", new String[]{"Accord", "Civic", "Clarity", "CR-V", "HR-V", "Insight", "Passport", "Pilot", "Ridgeline"});
-        modelosPorMarca.put("Hyundai", new String[]{"Elantra", "Kona", "Palisade", "Santa Cruz", "Santa Fe", "Sonata", "Tucson", "Venue"});
-        modelosPorMarca.put("Infiniti", new String[]{"Q50", "Q60", "QX50", "QX55", "QX60", "QX80"});
-        modelosPorMarca.put("Jeep", new String[]{"Cherokee", "Compass", "Gladiator", "Grand Cherokee", "Grand Cherokee L", "Grand Wagoneer", "Renegade", "Wagoneer", "Wrangler"});
-        modelosPorMarca.put("Kia", new String[]{"Carnival", "K4", "K5", "Niro", "Seltos", "Sorento", "Soul", "Sportage", "Stinger", "Telluride"});
-        modelosPorMarca.put("Lamborghini", new String[]{"Aventador", "Huracán", "Huracán Sterrato", "Revuelto", "Urus"});
-        modelosPorMarca.put("Lexus", new String[]{"ES", "GX", "IS", "LBX", "LC", "LM", "LS", "LX", "NX", "RX", "TX", "UX"});
-        modelosPorMarca.put("Mazda", new String[]{"CX-30", "CX-5", "CX-50", "CX-70", "CX-90", "Mazda3", "MX-5 Miata"});
-        modelosPorMarca.put("Mercedes-Benz", new String[]{"AMG", "Clase A – Clase S", "CLA", "CLS", "G-Class", "GLA – GLS"});
-        modelosPorMarca.put("Mini", new String[]{"Convertible", "Countryman", "John Cooper Works", "Mini Hatch"});
-        modelosPorMarca.put("Mitsubishi", new String[]{"Eclipse Cross", "Mirage", "Montero", "Outlander", "Outlander Sport"});
-        modelosPorMarca.put("Nissan", new String[]{"Altima", "Frontier", "Kicks", "Maxima", "Murano", "Pathfinder", "Rogue", "Sentra", "Titan", "Versa", "Z"});
-        modelosPorMarca.put("Porsche", new String[]{"718 Cayman / Boxster", "911", "Cayenne", "Macan", "Panamera"});
-        modelosPorMarca.put("RAM", new String[]{"ProMaster", "RAM 1500", "RAM 2500", "RAM 3500"});
-        modelosPorMarca.put("Tesla", new String[]{"Cybertruck", "Model 3", "Model S", "Model X", "Model Y", "Roadster"});
-        modelosPorMarca.put("Toyota", new String[]{"4Runner", "C-HR", "Camry", "Corolla", "Crown", "Grand Highlander", "GR Corolla", "GR Supra", "GR86", "Highlander", "Land Cruiser", "Mirai", "Prius", "RAV4", "Sequoia", "Sienna", "Tacoma", "Tundra", "Urban Cruiser"});
-        modelosPorMarca.put("Volkswagen", new String[]{"Arteon", "Atlas", "Golf", "Jetta", "Taos", "Tiguan"});
-        modelosPorMarca.put("Volvo", new String[]{"S60", "S90", "V60", "XC60", "XC90"});
+        modelosPorMarca.put("Acura", new String[]{"ILX", "Integra", "MDX", "NSX", "RDX", "RLX", "TLX","Other"});
+        modelosPorMarca.put("Audi", new String[]{"A3 – A8", "Q3 – Q8", "R8", "TT", "Versiones S/RS","Other"});
+        modelosPorMarca.put("BMW", new String[]{"M3", "M4", "M5", "M8", "Serie 2 – Serie 8", "X1 – X7", "Z4","Other"});
+        modelosPorMarca.put("Chrysler", new String[]{"300", "Pacifica", "Voyager","Other"});
+        modelosPorMarca.put("Ford", new String[]{"Bronco", "Bronco Sport", "Edge", "Escape", "Expedition", "Explorer", "F-150", "Maverick", "Mustang", "Ranger", "Transit","Other"});
+        modelosPorMarca.put("Honda", new String[]{"Accord", "Civic", "Clarity", "CR-V", "HR-V", "Insight", "Passport", "Pilot", "Ridgeline","Other"});
+        modelosPorMarca.put("Hyundai", new String[]{"Elantra", "Kona", "Palisade", "Santa Cruz", "Santa Fe", "Sonata", "Tucson", "Venue","Other"});
+        modelosPorMarca.put("Infiniti", new String[]{"Q50", "Q60", "QX50", "QX55", "QX60", "QX80","Other"});
+        modelosPorMarca.put("Jeep", new String[]{"Cherokee", "Compass", "Gladiator", "Grand Cherokee", "Grand Cherokee L", "Grand Wagoneer", "Renegade", "Wagoneer", "Wrangler","Other"});
+        modelosPorMarca.put("Kia", new String[]{"Carnival", "K4", "K5", "Niro", "Seltos", "Sorento", "Soul", "Sportage", "Stinger", "Telluride","Other"});
+        modelosPorMarca.put("Lamborghini", new String[]{"Aventador", "Huracán", "Huracán Sterrato", "Revuelto", "Urus","Other"});
+        modelosPorMarca.put("Lexus", new String[]{"ES", "GX", "IS", "LBX", "LC", "LM", "LS", "LX", "NX", "RX", "TX", "UX","Other"});
+        modelosPorMarca.put("Mazda", new String[]{"CX-30", "CX-5", "CX-50", "CX-70", "CX-90", "Mazda3", "MX-5 Miata","Other"});
+        modelosPorMarca.put("Mercedes-Benz", new String[]{"AMG", "Clase A–Clase S", "CLA", "CLS", "G-Class", "GLA–GLS","Other"});
+        modelosPorMarca.put("Mini", new String[]{"Convertible", "Countryman", "John Cooper Works", "Mini Hatch","Other"});
+        modelosPorMarca.put("Mitsubishi", new String[]{"Eclipse Cross", "Mirage", "Montero", "Outlander", "Outlander Sport","Other"});
+        modelosPorMarca.put("Nissan", new String[]{"Altima", "Frontier", "Kicks", "Maxima", "Murano", "Pathfinder", "Rogue", "Sentra", "Titan", "Versa", "Z","Other"});
+        modelosPorMarca.put("Porsche", new String[]{"718 Cayman / Boxster", "911", "Cayenne", "Macan", "Panamera","Other"});
+        modelosPorMarca.put("RAM", new String[]{"ProMaster", "RAM 1500", "RAM 2500", "RAM 3500","Other"});
+        modelosPorMarca.put("Tesla", new String[]{"Cybertruck", "Model 3", "Model S", "Model X", "Model Y", "Roadster","Other"});
+        modelosPorMarca.put("Toyota", new String[]{"4Runner", "C-HR", "Camry", "Corolla", "Crown", "Grand Highlander", "GR Corolla", "GR Supra", "GR86", "Highlander", "Land Cruiser", "Mirai", "Prius", "RAV4", "Sequoia", "Sienna", "Tacoma", "Tundra", "Urban Cruiser","Other"});
+        modelosPorMarca.put("Volkswagen", new String[]{"Arteon", "Atlas", "Golf", "Jetta", "Taos", "Tiguan", "Other"});
+        modelosPorMarca.put("Volvo", new String[]{"S60", "S90", "V60", "XC60", "XC90","Other"});
 
 // Adapter de marcas
         ArrayAdapter<String> adapterMarca = new ArrayAdapter<>(this, android.R.layout.simple_spinner_item, marcas);
