@@ -15,7 +15,6 @@
         tools:context=".GarageActivity">
 
 
-
     <TextView
 
             android:id="@+id/txtGarageName"
@@ -26,7 +25,7 @@
 
             android:text="Garaje"
 
-            android:textSize="24sp"
+            android:textSize="16sp"
 
             android:textStyle="bold"
 
@@ -37,7 +36,6 @@
             app:layout_constraintStart_toStartOf="parent"
 
             app:layout_constraintTop_toTopOf="parent"/>
-
 
 
     <ImageButton
@@ -56,14 +54,13 @@
 
             android:contentDescription="Añadir nuevo vehículo"
 
-            android:layout_marginTop="24dp"
+            android:layout_marginTop="16dp"
 
-            android:layout_marginEnd="24dp"
+            android:layout_marginEnd="20dp"
 
             app:layout_constraintTop_toTopOf="parent"
 
             app:layout_constraintEnd_toEndOf="parent" tools:src="@drawable/addnewbutton"/>
-
     <androidx.constraintlayout.widget.Guideline
 
             android:id="@+id/guideline_top_rv"
@@ -100,136 +97,36 @@
 
             app:layout_constraintTop_toTopOf="@id/guideline_top_rv"
 
-            app:layout_constraintBottom_toTopOf="@id/bottom_navigation_bar" app:layout_constraintHorizontal_bias="0.0"
+            app:layout_constraintBottom_toTopOf="@id/bottomNav" app:layout_constraintHorizontal_bias="0.0"
 
             app:layout_constraintVertical_bias="0.0"/>
 
-    <LinearLayout
 
-            android:id="@+id/bottom_navigation_bar"
-
-            android:layout_width="match_parent"
-
+    <com.google.android.material.bottomnavigation.BottomNavigationView
+            android:id="@+id/bottomNav"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
-
-            android:orientation="horizontal"
-
-            android:paddingVertical="8dp"
-
-            android:gravity="center"
-
             android:background="@android:color/white"
-
-            android:elevation="8dp"
-
+            app:itemIconTint="@color/selector_bottom_nav_tint"
+            app:itemTextColor="@color/selector_bottom_nav_tint"
+            app:menu="@menu/menu_bottom_nav"
             app:layout_constraintBottom_toBottomOf="parent"
-
             app:layout_constraintStart_toStartOf="parent"
-
-            app:layout_constraintEnd_toEndOf="parent">
-
-
-
-        <ImageButton
-
-                android:id="@+id/btnGarage"
-
-                android:layout_width="0dp"
-
-                android:layout_height="wrap_content"
-
-                android:layout_weight="1"
-
-                app:srcCompat="@drawable/garajebutton"
-
-                android:minHeight="48dp"
-
-                android:background="?attr/selectableItemBackgroundBorderless"
-
-                android:contentDescription="Garaje"/>
-
-
-
-        <ImageButton
-
-                android:id="@+id/btnTip"
-
-                android:layout_width="0dp"
-
-                android:layout_height="wrap_content"
-
-                android:layout_weight="1"
-
-                app:srcCompat="@drawable/consejobutton"
-
-                android:minHeight="48dp"
-
-                android:background="?attr/selectableItemBackgroundBorderless"
-
-                android:contentDescription="Consejos"/>
-
-
-
-        <ImageButton
-
-                android:id="@+id/btnInforme"
-
-                android:layout_width="0dp"
-
-                android:layout_height="wrap_content"
-
-                android:layout_weight="1"
-
-                app:srcCompat="@drawable/informebutton"
-
-                android:minHeight="48dp"
-
-                android:background="?attr/selectableItemBackgroundBorderless"
-
-                android:contentDescription="Informe"/>
-
-
-
-        <ImageButton
-
-                android:id="@+id/btnAccount"
-
-                android:layout_width="0dp"
-
-                android:layout_height="wrap_content"
-
-                android:layout_weight="1"
-
-                app:srcCompat="@drawable/perfilbutton"
-
-                android:minHeight="48dp"
-
-                android:background="?attr/selectableItemBackgroundBorderless"
-
-                android:contentDescription="Perfil"/>
-
-
-
-    </LinearLayout>
+            app:layout_constraintEnd_toEndOf="parent"/>
 
     <TextView
 
             android:text="Add Car"
 
-            android:layout_width="64dp"
+            android:layout_width="wrap_content"
 
-            android:layout_height="25dp" android:id="@+id/lblAddNewCar"
+            android:layout_height="wrap_content" android:id="@+id/lblAddNewCar"
 
             android:textStyle="bold"
 
-            app:layout_constraintTop_toBottomOf="@+id/imageButtonAddCar"
-
-            app:layout_constraintEnd_toEndOf="@+id/imageButtonAddCar"
-
-            app:layout_constraintStart_toStartOf="@+id/imageButtonAddCar"
-
-            android:layout_marginBottom="638dp"/>
-
+            android:textSize="12sp"
+            app:layout_constraintEnd_toStartOf="@+id/imageButtonAddCar" android:layout_marginEnd="8dp"
+            app:layout_constraintTop_toTopOf="parent" android:layout_marginTop="28dp"/>
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>

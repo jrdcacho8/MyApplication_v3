@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string-array name="mock_vehiculos">
+        <item>Seleccione un vehículo…</item>
+        <item>Toyota Tacoma 2015 (940-956)</item>
+        <item>Honda Civic 2018 (ABC-123)</item>
+    </string-array>
+</resources>

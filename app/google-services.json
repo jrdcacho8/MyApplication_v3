@@ -1,0 +1,47 @@
+{
+  "project_info": {
+    "project_number": "1020229272550",
+    "project_id": "al-dia-57f1c",
+    "storage_bucket": "al-dia-57f1c.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1020229272550:android:1948c39d77fe0d897a8c27",
+        "android_client_info": {
+          "package_name": "pupr.capstone.myapplication"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "1020229272550-sqqv5b5gruhibng0unb9ff48g93qe4f0.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "pupr.capstone.myapplication",
+            "certificate_hash": "2cee412c3c8bf6e5fc916d4826967f55dd109c06"
+          }
+        },
+        {
+          "client_id": "1020229272550-215s47uq2ceq56b2ddu1qkrdavke39iv.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAZMoSCJWXB0J0_Ogv1l5DUo1JXIYGnFO4"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "1020229272550-215s47uq2ceq56b2ddu1qkrdavke39iv.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

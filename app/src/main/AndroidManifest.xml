@@ -54,7 +54,10 @@
         </activity>
         <activity
                 android:parentActivityName=".MainActivity"
-                android:name=".ProfileActivity"/>
+                android:name=".ProfileActivity"
+        />
+        <activity android:name=".ServicesActivity" />
+        <activity android:name=".ServicesSelect"/>
     </application>
 
 </manifest>

@@ -25,6 +25,7 @@ public class GarageActivity extends AppCompatActivity {
     List<Vehicle> autos;
     AutoAdapter adapter;
     String userEmail;
+    private NotificationHelper notificationHelper;
 
 
     @Override
@@ -42,7 +43,8 @@ public class GarageActivity extends AppCompatActivity {
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
-
+        //notificationHelper.createNotificationChannel();
+        //requestNotificationPermission();
 
         // Change it here
         recyclerView = findViewById(R.id.recyclerViewAutos);
@@ -76,6 +78,7 @@ public class GarageActivity extends AppCompatActivity {
 
             }
         });
+        BottomNavRouter.setup(this, findViewById(R.id.bottomNav), R.id.nav_garaje, userEmail);
     }
 
     private void cargarAutosDesdeBD(String email) {
@@ -117,6 +120,12 @@ public class GarageActivity extends AppCompatActivity {
         }
     }
 
+    //Ir a la pantalla de servicios (Esdras)
+    public void handleServices(View v){
+        Intent i = new Intent(GarageActivity.this, ServicesSelect.class);
+        i.putExtra("email", userEmail);// Pasar email al formulario de servicios
+        startActivity(i);
+    }
     public void handleCrearAuto(View v) {
         Intent i = new Intent(this, AddCar.class);
         i.putExtra("email", userEmail); // Pasar email al formulario de nuevo auto
@@ -126,34 +135,42 @@ public class GarageActivity extends AppCompatActivity {
     public void setGarageName(String email) throws SQLException {
         MyJDBC myJDBC1 = new MyJDBC();
 
-        // Assuming obtenerConexion() is handled and throws exceptions correctly
-
         try (Connection connection = myJDBC1.obtenerConexion()) {
             if (connection != null) {
-                // Correct SELECT query syntax with a WHERE clause
                 String query = "SELECT NAME FROM USUARIO WHERE EMAIL = ?";
-
-                // Use try-with-resources for PreparedStatement too
                 try (PreparedStatement stmt = connection.prepareStatement(query)) {
-                    // Bind the input parameter, not the result variable
                     stmt.setString(1, email);
 
-                    // Use executeQuery() for SELECT statements
                     try (ResultSet rs = stmt.executeQuery()) {
                         if (rs.next()) {
-                            // Extract the value from the ResultSet
                             String garage_name = rs.getString("NAME");
+                            String userName;
 
+                            // 🔒 Evitar error si no hay espacios en el nombre
                             int firstSpaceIndex = garage_name.indexOf(" ");
-                            String userName = garage_name.substring(0, firstSpaceIndex);
+                            if (firstSpaceIndex > 0) {
+                                userName = garage_name.substring(0, firstSpaceIndex);
+                            } else {
+                                userName = garage_name; // usar el nombre completo
+                            }
+
                             TextView garage_owner = findViewById(R.id.txtGarageName);
                             garage_owner.setText(String.format("Garaje de %s", userName));
+                        } else {
+                            // Si no se encuentra el usuario, mostrar algo por defecto
+                            TextView garage_owner = findViewById(R.id.txtGarageName);
+                            garage_owner.setText("Garaje de usuario desconocido");
                         }
                     }
                 }
             }
-        } // connection and stmt are automatically closed here
+        } catch (SQLException e) {
+            e.printStackTrace();
+            TextView garage_owner = findViewById(R.id.txtGarageName);
+            garage_owner.setText("Error al cargar el garaje");
+        }
     }
+
 }
 
 

@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item
+            android:id="@+id/nav_garaje"
+            android:icon="@drawable/ic_garage_24"
+            android:title="Garaje"/>
+    <item
+            android:id="@+id/nav_alerta"
+            android:icon="@drawable/ic_tip_chat_24"
+            android:title="Consejo"/>
+    <item
+            android:id="@+id/nav_informe"
+            android:icon="@drawable/ic_report_24"
+            android:title="Informe"/>
+    <item
+            android:id="@+id/nav_perfil"
+            android:icon="@drawable/ic_profile_24"
+            android:title="Perfil"/>
+</menu>

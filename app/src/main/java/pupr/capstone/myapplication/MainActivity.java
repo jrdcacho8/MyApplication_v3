@@ -1,12 +1,25 @@
 package pupr.capstone.myapplication;
 
+import android.Manifest;
 import android.content.Intent;
+import android.content.pm.PackageManager;
+import android.os.Build;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
+import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
+import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
+import com.google.android.gms.common.api.ApiException;
+import com.google.android.gms.tasks.Task;
+import com.google.android.gms.auth.api.signin.GoogleSignIn;
+import com.google.android.gms.auth.api.signin.GoogleSignInClient;
 
 /*
 import androidx.annotation.NonNull;
@@ -50,11 +63,32 @@ public class MainActivity extends AppCompatActivity {
     Connection connect;
     String ConnectionResult="";
 
+    // 🌐 Google Sign In
+    private static final int RC_SIGN_IN = 9001;
+    private GoogleSignInClient mGoogleSignInClient;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        // Configurar Google Sign In
+        GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
+                .requestEmail()
+                .build();
+        mGoogleSignInClient = GoogleSignIn.getClient(this, gso);
+
+        // Botón login normal
+        Button accessButton = findViewById(R.id.accessButton);
+        accessButton.setOnClickListener(v -> handleAccess(v));
+
+        // Botón crear cuenta
+        Button createButton = findViewById(R.id.createButton);
+        createButton.setOnClickListener(v -> handleCreateAccount(v));
+
+        // Botón Google
+        Button googleButton = findViewById(R.id.google_signIn);
+        googleButton.setOnClickListener(v -> signIn());
     }
 
     public void handleAccess(View v){
@@ -107,5 +141,50 @@ public class MainActivity extends AppCompatActivity {
     public void handleCreateAccount(View v){
         Intent i= new Intent(this, ProfileActivity.class);
         startActivity(i);
+    }
+
+
+    // 🌐 Google Sign In
+    private void signIn() {
+        //Forzar logout antes de iniciar sesión
+        mGoogleSignInClient.signOut().addOnCompleteListener(this, task -> {
+            Intent signInIntent = mGoogleSignInClient.getSignInIntent();
+            startActivityForResult(signInIntent, RC_SIGN_IN);
+        });
+    }
+    private void requestNotificationPermission() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) { // Android 13+
+            if (ContextCompat.checkSelfPermission(this, Manifest.permission.POST_NOTIFICATIONS)
+                    != PackageManager.PERMISSION_GRANTED) {
+                ActivityCompat.requestPermissions(
+                        this,
+                        new String[]{Manifest.permission.POST_NOTIFICATIONS},
+                        101
+                );
+            }
+        }
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode == RC_SIGN_IN) {
+            Task<GoogleSignInAccount> task = GoogleSignIn.getSignedInAccountFromIntent(data);
+            try {
+                GoogleSignInAccount account = task.getResult(ApiException.class);
+                String email = account.getEmail();
+
+                Toast.makeText(this, "Bienvenido: " + account.getDisplayName(), Toast.LENGTH_SHORT).show();
+
+                // 🚗 Redirigir a la misma pantalla que login normal
+                Intent i = new Intent(this, GarageActivity.class);
+                i.putExtra("email", email);
+                startActivity(i);
+
+            } catch (ApiException e) {
+                Log.w("GoogleSignIn", "Error en login: " + e.getStatusCode());
+                Toast.makeText(this, "Fallo login con Google", Toast.LENGTH_SHORT).show();
+            }
+        }
     }
 }
