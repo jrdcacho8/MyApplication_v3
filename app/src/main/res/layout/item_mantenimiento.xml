@@ -58,7 +58,7 @@
                 tools:srcCompat="@tools:sample/avatars" />
 
         <TextView
-                android:id="@+id/lblVence"
+                android:id="@+id/lblDueDate"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Vence:"
@@ -75,8 +75,8 @@
                 android:text="15/10/2025"
                 android:textSize="18sp"
                 android:textColor="@color/black"
-                app:layout_constraintTop_toBottomOf="@+id/lblVence"
-                app:layout_constraintStart_toStartOf="@+id/lblVence"
+                app:layout_constraintTop_toBottomOf="@+id/lblDueDate"
+                app:layout_constraintStart_toStartOf="@+id/lblDueDate"
                 app:layout_constraintEnd_toEndOf="parent"
                 android:layout_marginEnd="16dp"
                 android:layout_marginTop="4dp"

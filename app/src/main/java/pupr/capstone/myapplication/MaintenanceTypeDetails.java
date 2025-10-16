@@ -24,6 +24,8 @@ public class MaintenanceTypeDetails extends AppCompatActivity {
     private Button btnUpdate;
     private FloatingActionButton backButton, editButton;
 
+    public boolean edit_token= false;
+
     private LocalDate last_maintenance_date;
 
     @Override
@@ -41,6 +43,9 @@ public class MaintenanceTypeDetails extends AppCompatActivity {
         backButton             = findViewById(R.id.backButton);
         editButton             = findViewById(R.id.editButton);
         lblLastMaintenance      =findViewById(R.id.lblLastMaintenance);
+
+        //to signal de edit of alert
+
 
         // --- recibe extras del intent ---
         Intent intent = getIntent();
@@ -118,14 +123,33 @@ public class MaintenanceTypeDetails extends AppCompatActivity {
 
         // Botón editar (haz lo que necesites: habilitar campos, abrir otro layout, etc.)
         editButton.setOnClickListener(v -> {
-            txtNote.setEnabled(true);
+
+            String nextDate = txtNextMaintenance.getText().toString().trim();
+            DateTimeFormatter output = DateTimeFormatter.ofPattern("MMM-dd-yyyy", Locale.US);
+            LocalDate mantLastDate = LocalDate.parse(nextDate,output);
+
+            String formattedDate = mantLastDate.format(output);
+            txtNextMaintenance.setText(formattedDate);
+            edit_token= true;
+
+
+
             txtLastDateMaintenance.setEnabled(true);
             txtNextMaintenance.setEnabled(true);
-            // podrías mostrar un pequeño Toast o cambiar ícono a "guardar"
+            lblLastMaintenance.setVisibility(View.VISIBLE);
+            txtLastDateMaintenance.setVisibility(View.VISIBLE);
+            btnUpdate.setEnabled(true);
+            btnUpdate.setText("Actualizar");
+
+
+
+
+
         });
 
         // Actualizar (ejemplo de validación simple)
         btnUpdate.setOnClickListener(v -> {
+
             String lastDate = txtLastDateMaintenance.getText().toString().trim();
             DateTimeFormatter output = DateTimeFormatter.ofPattern("MMM-dd-yyyy", Locale.US);
             LocalDate mantLastDate = LocalDate.parse(lastDate,output);
@@ -135,10 +159,14 @@ public class MaintenanceTypeDetails extends AppCompatActivity {
             String formattedDate = nextMaintenanceDate.format(output);
             txtNextMaintenance.setText(formattedDate);
 
-            uploadAlertToDB(nextMaintenanceDate, maintenance_type, userEmail, car_license_plate);
 
-            // Por ahora solo cierra o muestra un toast
-            Toast.makeText(this, "Actualizado", Toast.LENGTH_SHORT).show();
+            if (edit_token== false){
+                uploadAlertToDB(nextMaintenanceDate, maintenance_type, userEmail, car_license_plate);
+                // Por ahora solo cierra o muestra un toast
+                Toast.makeText(this, "Actualizado", Toast.LENGTH_SHORT).show();}
+            else if (edit_token= true){
+                editAlertToDB(nextMaintenanceDate, maintenance_type, userEmail, car_license_plate);
+            }
         });
     }
 
@@ -189,7 +217,7 @@ public class MaintenanceTypeDetails extends AppCompatActivity {
                 int rows = stmt.executeUpdate();
 
                 if (rows > 0) {
-                    Toast.makeText(this, "Recordatorio de "+ maintenance_type , Toast.LENGTH_LONG).show();
+                    Toast.makeText(this, "Recordatorio de "+ maintenance_type+ " activado" , Toast.LENGTH_LONG).show();
                     finish(); // O redirigir a otra actividad
                     Intent i = new Intent(this, GarageActivity.class);
                     i.putExtra("email", email);
@@ -208,8 +236,47 @@ public class MaintenanceTypeDetails extends AppCompatActivity {
         }
 
 
+
     }
     // --- Inside MyJDBC.java ---
+    private void editAlertToDB(LocalDate alert_date, String maintenance_type, String email, String license_plate){
+        try {
+            MyJDBC jdbc = new MyJDBC();
+            java.sql.Connection con = jdbc.obtenerConexion();
+
+            if (con != null) {
+                String query = "UPDATE ALERT SET ALERT_DATE = ? WHERE NAME_ALERT = ? AND EMAIL = ? AND LICENSE_PLATE = ?";
+                java.sql.PreparedStatement stmt = con.prepareStatement(query);
+                stmt.setString(1, alert_date.toString());
+                stmt.setString(2, maintenance_type);
+                stmt.setString(3, email);
+                stmt.setString(4, license_plate);
+
+                int rows = stmt.executeUpdate();
+
+                if (rows > 0) {
+                    Toast.makeText(this, "Recordatorio de "+ maintenance_type+ " editado" , Toast.LENGTH_LONG).show();
+                    finish(); // O redirigir a otra actividad
+                    Intent i = new Intent(this, GarageActivity.class);
+                    i.putExtra("email", email);
+                    startActivity(i);
+                } else {
+                    Toast.makeText(this, "Error al guardar", Toast.LENGTH_SHORT).show();
+                }
+
+                con.close();
+            } else {
+                Toast.makeText(this, "No se pudo conectar con la base de datos", Toast.LENGTH_SHORT).show();
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            Toast.makeText(this, "Error: " + e.getMessage(), Toast.LENGTH_LONG).show();
+        }
+
+
+
+    }
+
 
     public LocalDate getExistingAlertDate(String email, String licensePlate, String maintenanceType) {
         String query = "SELECT ALERT_DATE FROM ALERT WHERE EMAIL = ? AND LICENSE_PLATE = ? AND NAME_ALERT = ?";
@@ -219,7 +286,7 @@ public class MaintenanceTypeDetails extends AppCompatActivity {
         java.sql.Connection con = jdbc.obtenerConexion();
 
         try (
-             java.sql.PreparedStatement stmt = con.prepareStatement(query)) {
+                java.sql.PreparedStatement stmt = con.prepareStatement(query)) {
 
             stmt.setString(1, email);
             stmt.setString(2, licensePlate);
