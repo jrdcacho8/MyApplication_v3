@@ -130,7 +130,7 @@ public class MaintenanceTypeDetails extends AppCompatActivity {
             DateTimeFormatter output = DateTimeFormatter.ofPattern("MMM-dd-yyyy", Locale.US);
             LocalDate mantLastDate = LocalDate.parse(lastDate,output);
 
-            LocalDate nextMaintenanceDate = mantLastDate.plusDays(daysToAdd);
+            LocalDate nextMaintenanceDate = mantLastDate.plusDays(daysToAdd);//OJO:aqui esta la data necesaria para la alerta de emails y notificaciones
 
             String formattedDate = nextMaintenanceDate.format(output);
             txtNextMaintenance.setText(formattedDate);
