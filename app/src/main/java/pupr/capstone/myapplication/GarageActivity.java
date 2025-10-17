@@ -43,8 +43,7 @@ public class GarageActivity extends AppCompatActivity {
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
-        //notificationHelper.createNotificationChannel();
-        //requestNotificationPermission();
+
 
         // Change it here
         recyclerView = findViewById(R.id.recyclerViewAutos);
@@ -120,12 +119,6 @@ public class GarageActivity extends AppCompatActivity {
         }
     }
 
-    //Ir a la pantalla de servicios (Esdras)
-    public void handleServices(View v){
-        Intent i = new Intent(GarageActivity.this, ServicesSelect.class);
-        i.putExtra("email", userEmail);// Pasar email al formulario de servicios
-        startActivity(i);
-    }
     public void handleCrearAuto(View v) {
         Intent i = new Intent(this, AddCar.class);
         i.putExtra("email", userEmail); // Pasar email al formulario de nuevo auto

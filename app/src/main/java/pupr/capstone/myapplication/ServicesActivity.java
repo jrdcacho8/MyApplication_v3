@@ -267,18 +267,38 @@ public class ServicesActivity extends AppCompatActivity {
     }
 
     private void mostrarDatePicker() {
-        Calendar cal = Calendar.getInstance();
+        Calendar hoy = Calendar.getInstance();
+
         DatePickerDialog dialog = new DatePickerDialog(
                 this,
-                (view, year, month, day) -> {
-                    String fecha = String.format(Locale.US, "%02d-%02d-%04d", day, month + 1, year);
+                (view, year, month, dayOfMonth) -> {
+                    String fecha = String.format(Locale.US, "%02d-%02d-%04d", dayOfMonth, month + 1, year);
                     tvFechaSeleccionada.setText("Fecha: " + fecha);
+
                     Calendar seleccion = Calendar.getInstance();
-                    seleccion.set(year, month, day);
+                    seleccion.set(year, month, dayOfMonth, 0, 0, 0);
+                    seleccion.set(Calendar.MILLISECOND, 0);
+
                     formulario.setFechaServicioMs(seleccion.getTimeInMillis());
                     mostrarErrores();
                 },
-                cal.get(Calendar.YEAR), cal.get(Calendar.MONTH), cal.get(Calendar.DAY_OF_MONTH));
+                hoy.get(Calendar.YEAR),
+                hoy.get(Calendar.MONTH),
+                hoy.get(Calendar.DAY_OF_MONTH)
+        );
+
+        // 🔒 Bloquear fechas futuras (permitir hoy y pasadas)
+        // Opción 1 (sencilla): hasta este instante
+        // dialog.getDatePicker().setMaxDate(System.currentTimeMillis());
+
+        // Opción 2 (más precisa): hasta el final del día de hoy (23:59:59.999)
+        Calendar finDeHoy = Calendar.getInstance();
+        finDeHoy.set(Calendar.HOUR_OF_DAY, 23);
+        finDeHoy.set(Calendar.MINUTE, 59);
+        finDeHoy.set(Calendar.SECOND, 59);
+        finDeHoy.set(Calendar.MILLISECOND, 999);
+        dialog.getDatePicker().setMaxDate(finDeHoy.getTimeInMillis());
+
         dialog.show();
     }
 

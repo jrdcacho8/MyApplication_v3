@@ -1,12 +1,16 @@
 package pupr.capstone.myapplication;
 
+import android.Manifest;
 import android.app.DatePickerDialog;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.icu.text.SimpleDateFormat;
 import android.os.Build;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.*;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import androidx.appcompat.app.AppCompatActivity;
 
@@ -23,6 +27,7 @@ public class MaintenanceTypeDetails extends AppCompatActivity {
     private EditText txtLastDateMaintenance, txtNextMaintenance;
     private Button btnUpdate;
     private FloatingActionButton backButton, editButton;
+    private NotificationHelper notificationHelper;
 
     public boolean edit_token= false;
 
@@ -45,7 +50,11 @@ public class MaintenanceTypeDetails extends AppCompatActivity {
         lblLastMaintenance      =findViewById(R.id.lblLastMaintenance);
 
         //to signal de edit of alert
+        notificationHelper = new NotificationHelper(this);
 
+        // Create the notification channel
+        notificationHelper.createNotificationChannel();
+        requestNotificationPermission();
 
         // --- recibe extras del intent ---
         Intent intent = getIntent();
@@ -167,9 +176,72 @@ public class MaintenanceTypeDetails extends AppCompatActivity {
             else if (edit_token= true){
                 editAlertToDB(nextMaintenanceDate, maintenance_type, userEmail, car_license_plate);
             }
+            // Programar notificación
+            scheduleTestNotification(car_brand, car_model, car_license_plate, maintenance_type);
+
+            // Construir asunto y cuerpo con tu formato
+            String subject = "Alerta de Mantenimiento";
+
+            // Asegúrate de tener disponibles: brand, model, car_license_plate, maintenance_type
+            String body =
+                    "Saludo,\n\n" +
+                            "El Vehiculo " + car_brand + " " + car_model +
+                            " Tablilla " + car_license_plate +
+                            " necesita " + maintenance_type +
+                            " el cual vence hoy.";
+
+            // Programar el correo a las 7:00 AM del nextMaintenanceDate
+            NotificationHelper.scheduleMaintenanceEmailAt7am(
+                    this,
+                    nextMaintenanceDate,
+                    userEmail,     // o varios: "a@x.com,b@y.com"
+                    subject,
+                    body
+            );
+
+            Toast.makeText(this,
+                    "Actualizado y correo programado para las 7:00 AM del " + formattedDate,
+                    Toast.LENGTH_LONG
+            ).show();
         });
     }
 
+    private void scheduleTestNotification(String brand, String model,
+                                          String plate, String maintenanceType) {
+        try {
+            // Texto IDENTICO al correo
+            String title = "Alerta de Mantenimiento";
+            String message =
+                    "Saludo,\n\n" +
+                            "El Vehiculo " + brand + " " + model +
+                            " Tablilla " + plate +
+                            " necesita " + maintenanceType +
+                            " el cual vence hoy.";
+
+            // Dispara en 10s para probar
+            Calendar calendar = Calendar.getInstance();
+            calendar.add(Calendar.SECOND, 10);
+            long time = calendar.getTimeInMillis();
+
+            notificationHelper.scheduleNotification(time, title, message);
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            Toast.makeText(this, "Error al programar la notificación", Toast.LENGTH_SHORT).show();
+        }
+    }
+    private void requestNotificationPermission() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) { // Android 13+
+            if (ContextCompat.checkSelfPermission(this, Manifest.permission.POST_NOTIFICATIONS)
+                    != PackageManager.PERMISSION_GRANTED) {
+                ActivityCompat.requestPermissions(
+                        this,
+                        new String[]{Manifest.permission.POST_NOTIFICATIONS},
+                        101
+                );
+            }
+        }
+    }
     private LocalDate showDatePicker(EditText target) {
         // 1. Get the current date to initialize the DatePickerDialog
         Calendar selectedDate = Calendar.getInstance();

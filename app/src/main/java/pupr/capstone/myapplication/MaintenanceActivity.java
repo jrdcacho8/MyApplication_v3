@@ -53,13 +53,15 @@ public class MaintenanceActivity extends AppCompatActivity {
 
         textActivityMaintenance.setText(String.join(" ", marca, license_plate));
 
-        // Cargar mantenimientos de la BD usando la marca como nombre de tabla
-        cargarMantenimientosDesdeBD(marca);
+
 
         car= new Vehicle(marca, license_plate,model);
 
         adapter = new MaintenanceAdapter(listaMaintenances,car, email);
         recyclerView.setAdapter(adapter);
+
+        // Cargar mantenimientos de la BD usando la marca como nombre de tabla
+        cargarMantenimientosDesdeBD(marca);
 
        //Maintenance maintenance= new Maintenance(listaMaintenances.get(0));
         //Escrito por Esdras

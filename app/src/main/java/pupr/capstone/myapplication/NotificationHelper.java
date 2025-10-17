@@ -10,6 +10,10 @@ import android.content.Intent;
 import android.os.Build;
 import android.widget.Toast;
 
+import java.time.LocalDate;
+import java.time.LocalTime;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
 import java.util.Date;
 
 public class NotificationHelper {
@@ -32,7 +36,38 @@ public class NotificationHelper {
             manager.createNotificationChannel(channel);
         }
     }
+    @SuppressLint("ScheduleExactAlarm")
+    public static void scheduleMaintenanceEmailAt7am(Context context,
+                                                     LocalDate date,       // nextMaintenanceDate
+                                                     String recipients,    // "correo1@x.com,correo2@x.com"
+                                                     String subject,       // opcional (ver comentario abajo)
+                                                     String body) {        // opcional (ver comentario abajo)
 
+        // 7:00 AM en la zona local del dispositivo
+        ZonedDateTime zdt = ZonedDateTime.of(date, LocalTime.of(7, 0), ZoneId.systemDefault());
+        long triggerAtMillis = zdt.toInstant().toEpochMilli();
+
+        Intent intent = new Intent(context, NotificationReceiver.class);
+        intent.setAction(NotificationReceiver.ACTION_SEND_MAINTENANCE_EMAIL);
+        intent.putExtra(NotificationReceiver.EXTRA_RECIPIENTS, recipients);
+        intent.putExtra(NotificationReceiver.EXTRA_SUBJECT, subject);
+        intent.putExtra(NotificationReceiver.EXTRA_BODY, body);
+
+        int requestCode = (int) (triggerAtMillis % Integer.MAX_VALUE);
+
+        PendingIntent pi = PendingIntent.getBroadcast(
+                context,
+                requestCode,
+                intent,
+                PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE
+        );
+
+        AlarmManager am = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
+        if (am != null) {
+            // Programa alarma exacta (incluso en Doze)
+            am.setExactAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, triggerAtMillis, pi);
+        }
+    }
     // Schedule notification
     @SuppressLint("ScheduleExactAlarm")
     public void scheduleNotification(long timeInMillis, String title, String message) {

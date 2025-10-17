@@ -173,6 +173,9 @@ public class MainActivity extends AppCompatActivity {
             try {
                 GoogleSignInAccount account = task.getResult(ApiException.class);
                 String email = account.getEmail();
+                String name  = account.getDisplayName();
+                // Guarda/actualiza en BD (hazlo en un hilo)
+                saveGoogleUserToDB(email, name);
 
                 Toast.makeText(this, "Bienvenido: " + account.getDisplayName(), Toast.LENGTH_SHORT).show();
 
@@ -187,4 +190,38 @@ public class MainActivity extends AppCompatActivity {
             }
         }
     }
+    private void saveGoogleUserToDB(String email, String name) {
+        new Thread(() -> {
+            try {
+                MyJDBC myJDBC = new MyJDBC();
+                java.sql.Connection cn = myJDBC.obtenerConexion();
+                if (cn == null) {
+                    runOnUiThread(() ->
+                            Toast.makeText(this, "No se pudo conectar a la BD", Toast.LENGTH_SHORT).show()
+                    );
+                    return;
+                }
+
+                // Ajusta los nombres de columnas/tabla a tu esquema real.
+                // Requiere que EMAIL sea UNIQUE/PRIMARY KEY en USUARIO.
+                String sql = "INSERT INTO USUARIO (EMAIL, NAME, PASSWORD, PROVIDER) " +
+                        "VALUES (?, ?, NULL, 'google') " +
+                        "ON DUPLICATE KEY UPDATE NAME = VALUES(NAME), PROVIDER = 'google'";
+
+                try (java.sql.PreparedStatement ps = cn.prepareStatement(sql)) {
+                    ps.setString(1, email);
+                    ps.setString(2, name != null ? name : "");
+                    ps.executeUpdate();
+                }
+
+                cn.close();
+            } catch (Exception e) {
+                e.printStackTrace();
+                runOnUiThread(() ->
+                        Toast.makeText(this, "Error guardando usuario Google: " + e.getMessage(), Toast.LENGTH_LONG).show()
+                );
+            }
+        }).start();
+    }
+
 }
