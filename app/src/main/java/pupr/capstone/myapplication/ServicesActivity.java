@@ -196,7 +196,7 @@ public class ServicesActivity extends AppCompatActivity {
     private void setupSpinner() {
         String[] tiposMantenimiento = {
                 "Seleccionar tipo...", "Aceite de Motor", "Coolant/Anticongelante",
-                "Rotación de Gomas", "Filtro de Aire", "Sistema de Frenos"
+                "Rotación de Gomas", "Filtro de Aire", "Sistema de Frenos","Otro"
         };
         ArrayAdapter<String> adapter = new ArrayAdapter<>(
                 this, android.R.layout.simple_spinner_item, tiposMantenimiento);

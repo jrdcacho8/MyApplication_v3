@@ -185,10 +185,7 @@ public class MaintenanceTypeDetails extends AppCompatActivity {
             // Asegúrate de tener disponibles: brand, model, car_license_plate, maintenance_type
             String body =
                     "Saludo,\n\n" +
-                            "El Vehiculo " + car_brand +
-                            " Tablilla " + car_license_plate +
-                            " necesita " + maintenance_type +
-                            " el cual vence hoy.";
+                            "El Vehiculo " + car_brand + " Tablilla " + car_license_plate + " necesita " + maintenance_type + " el cual vence hoy.";
 
             // Programar el correo a las 7:00 AM del nextMaintenanceDate
             NotificationHelper.scheduleMaintenanceEmailAt7am(
