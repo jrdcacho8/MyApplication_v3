@@ -185,7 +185,7 @@ public class MaintenanceTypeDetails extends AppCompatActivity {
             // Asegúrate de tener disponibles: brand, model, car_license_plate, maintenance_type
             String body =
                     "Saludo,\n\n" +
-                            "El Vehiculo " + car_brand + " " + car_model +
+                            "El Vehiculo " + car_brand +
                             " Tablilla " + car_license_plate +
                             " necesita " + maintenance_type +
                             " el cual vence hoy.";

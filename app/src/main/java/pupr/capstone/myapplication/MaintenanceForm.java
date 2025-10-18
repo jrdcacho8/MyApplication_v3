@@ -68,21 +68,26 @@ public class MaintenanceForm {
         validarCampo("fecha");
     }
 
-    public void setCosto(float costo) {
-        this.costo = costo;
-        validarCampo("costo");
-    }
-
     public void setCosto(String costoString) {
         try {
-            String cleanCosto = costoString.replace("$", "").replace(",", "").trim();
-            this.costo = Float.parseFloat(cleanCosto);
+            if (costoString == null) costoString = "";
+            String cleanCosto = costoString
+                    .replace("$", "")
+                    .replace(" ", "")
+                    .replace(",", ".")   // ← COMA a PUNTO
+                    .trim();
+            if (cleanCosto.isEmpty()) {
+                this.costo = 0f;
+            } else {
+                this.costo = Float.parseFloat(cleanCosto);
+            }
             validarCampo("costo");
         } catch (NumberFormatException e) {
             errores.put("costo", "El costo debe ser un número válido");
             actualizarEstadoFormulario();
         }
     }
+
 
 
 

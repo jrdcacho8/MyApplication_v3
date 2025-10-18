@@ -24,7 +24,7 @@ public class JavaMailUtil {
         properties.put("mail.smtp.port", "587");
 
         String myAccountEmail = "aldia.app02@gmail.com";
-        String password = "Pelusa123"; // App password de Gmail (no publiques esto en producción)
+        String password = "zagz feiw tgep yqet"; // App password de Gmail (no publiques esto en producción)
 
         Session session = Session.getInstance(properties, new javax.mail.Authenticator() {
             @Override

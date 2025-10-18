@@ -4,6 +4,7 @@ import android.app.DatePickerDialog;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
+import android.text.Editable;
 import android.widget.*;
 import android.view.View;
 
@@ -214,7 +215,10 @@ public class ServicesActivity extends AppCompatActivity {
             @Override public void onNothingSelected(AdapterView<?> parent) {}
         });
     }
-
+    abstract class SimpleTextWatcher implements android.text.TextWatcher {
+        @Override public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
+        @Override public void onTextChanged(CharSequence s, int start, int before, int count) {}
+    }
     private void setupListeners() {
         btnFecha.setOnClickListener(v -> mostrarDatePicker());
 
@@ -223,9 +227,28 @@ public class ServicesActivity extends AppCompatActivity {
 
         btnGuardar.setOnClickListener(v -> guardarServicio());
         btnLimpiar.setOnClickListener(v -> limpiarFormulario());
+
+        // ✅ Actualizar validación en vivo
+        etCompania.addTextChangedListener(new SimpleTextWatcher() {
+            @Override public void afterTextChanged(Editable s) {
+                formulario.setCompania(s.toString().trim());
+                mostrarErrores();
+            }
+        });
+
+        etCosto.addTextChangedListener(new SimpleTextWatcher() {
+            @Override public void afterTextChanged(Editable s) {
+                formulario.setCosto(s.toString());
+                mostrarErrores();
+            }
+        });
     }
 
     private void guardarServicio() {
+        // 1) Pasar valores actuales de los EditText al formulario
+        formulario.setCompania(etCompania.getText().toString().trim());
+        formulario.setCosto(etCosto.getText().toString().trim());  // usa tu setCosto(String)
+
         if (!formulario.validarFormulario()) {
             mostrarErrores();
             return;
@@ -238,20 +261,55 @@ public class ServicesActivity extends AppCompatActivity {
                 Connection connection = myJDBC.obtenerConexion();
 
                 if (connection != null) {
-                    String query = "INSERT INTO SERVICIOS (EMAIL, VEHICULO, TIPO, COMPANIA, COSTO, FECHA) " +
-                            "VALUES (?, ?, ?, ?, ?, ?)";
-                    PreparedStatement stmt = connection.prepareStatement(query);
-                    stmt.setString(1, userEmail);
-                    stmt.setString(2, formulario.getVehiculoSeleccionado());
-                    stmt.setString(3, formulario.getTipoMantenimiento());
-                    stmt.setString(4, etCompania.getText().toString());
-                    stmt.setString(5, etCosto.getText().toString());
-                    stmt.setLong(6, formulario.getFechaServicioMs());
-                    stmt.executeUpdate();
+                    // Asegúrate de que estas columnas existen exactamente así en tu tabla
+                    String sql = "INSERT INTO SERVICIO " +
+                            "(SERVICE_TYPE, EMAIL, LICENSE_PLATE, DESCRIPTION, COST_SERVICE, COMPANY_SERVICE, DATE_SERVICE) " +
+                            "VALUES (?, ?, ?, ?, ?, ?, ?)";
 
-                    stmt.close();
+                    try (PreparedStatement stmt = connection.prepareStatement(sql)) {
+                        // SERVICE_TYPE: del spinner (tipo de mantenimiento)
+                        String serviceType = formulario.getTipoMantenimiento(); // ej. "Coolant/Anticongelante"
+                        // EMAIL: viene del intent
+                        String email = userEmail;
+                        // LICENSE_PLATE: SOLO la tablilla, no "Marca Modelo (Tablilla)"
+                        String licensePlate = formulario.getTablillaVehiculo();
+                        // DESCRIPTION: obligatorio NOT NULL en tu DDL
+                        String description = "Servicio registrado en app"; // o usa otro campo de UI si tienes
+                        // COST_SERVICE: DECIMAL — usa BigDecimal
+                        java.math.BigDecimal cost = null;
+                        String costoStr = etCosto.getText().toString().trim();
+                        if (!costoStr.isEmpty()) {
+                            // Normaliza coma/punto si el usuario escribió con coma
+                            costoStr = costoStr.replace(',', '.');
+                            cost = new java.math.BigDecimal(costoStr);
+                        }
+                        // COMPANY_SERVICE
+                        String company = etCompania.getText().toString().trim();
+                        // DATE_SERVICE: si la columna es DATE usa java.sql.Date
+                        long fechaMs = formulario.getFechaServicioMs(); // viene del DatePicker (00:00:00 del día)
+                        java.sql.Date dateService = new java.sql.Date(fechaMs);
+                        // Si tu columna es DATETIME, usa:
+                        // java.sql.Timestamp dateService = new java.sql.Timestamp(fechaMs);
+
+                        // Valida claves foráneas: email y tablilla deben existir previamente
+                        stmt.setString(1, serviceType);
+                        stmt.setString(2, email);
+                        stmt.setString(3, licensePlate);
+                        stmt.setString(4, description);
+                        if (cost != null) {
+                            stmt.setBigDecimal(5, cost);
+                        } else {
+                            stmt.setNull(5, java.sql.Types.DECIMAL);
+                        }
+                        stmt.setString(6, company);
+                        stmt.setDate(7, dateService); // o setTimestamp si usas DATETIME
+
+                        int rows = stmt.executeUpdate();
+                        resultado = (rows == 1) ? "✓ Servicio guardado exitosamente"
+                                : "No se insertó registro (rows=" + rows + ")";
+                    }
+
                     connection.close();
-                    resultado = "✓ Servicio guardado exitosamente";
                 } else {
                     resultado = "Error: No se pudo conectar a la base de datos";
                 }
