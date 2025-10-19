@@ -23,20 +23,19 @@ public class MaintenanceAdapter extends RecyclerView.Adapter<MaintenanceAdapter.
     private OnItemClickListener listener;
 
 
-
-    public MaintenanceAdapter(List<Maintenance> listaMaintenances ) {
+    public MaintenanceAdapter(List<Maintenance> listaMaintenances) {
         this.listaMaintenances = listaMaintenances;
     }
 
-    public MaintenanceAdapter(List<Maintenance> listaMaintenances, String userEmail ) {
+    public MaintenanceAdapter(List<Maintenance> listaMaintenances, String userEmail) {
         this.listaMaintenances = listaMaintenances;
-        this.userEmail=userEmail;
+        this.userEmail = userEmail;
     }
 
-    public MaintenanceAdapter(List<Maintenance> listaMaintenances, Vehicle auto, String userEmail ) {
+    public MaintenanceAdapter(List<Maintenance> listaMaintenances, Vehicle auto, String userEmail) {
         this.listaMaintenances = listaMaintenances;
         this.auto = auto;
-        this.userEmail= userEmail;
+        this.userEmail = userEmail;
     }
 
     @NonNull
@@ -57,12 +56,22 @@ public class MaintenanceAdapter extends RecyclerView.Adapter<MaintenanceAdapter.
 
         holder.textMantenimiento.setText(maintenance.getMaintenance());
 
+        int mileage_due = checkGetExistingMileageDue(userEmail, auto.getLicense_plate(), maintenance.getMaintenance());
+        String alertDate = checkGetExistingAlertDate(userEmail, auto.getLicense_plate(), maintenance.getMaintenance());
+        String str, txt;
+        if (alertDate != null && mileage_due != 0) {
 
-        String alertDate= checkgetExistingAlertDate(userEmail, auto.getLicense_plate(), maintenance.getMaintenance());
-        if (alertDate==null) {
 
-        }
-        else{
+            holder.lblDueDate.setVisibility(View.VISIBLE);
+            holder.txtDueDate.setVisibility(View.VISIBLE);
+
+            LocalDate mantLastDate = LocalDate.parse(alertDate, date_format);
+            String formattedDate = mantLastDate.format(output);
+            str = Integer.toString(mileage_due);
+            txt = formattedDate + "or" + str;
+            holder.txtDueDate.setText(txt);
+
+        } else if (alertDate != null) {
 
             holder.lblDueDate.setVisibility(View.VISIBLE);
             holder.txtDueDate.setVisibility(View.VISIBLE);
@@ -72,9 +81,17 @@ public class MaintenanceAdapter extends RecyclerView.Adapter<MaintenanceAdapter.
 
             holder.txtDueDate.setText(formattedDate);
 
+        } else if (mileage_due != 0) {
+
+
+            str = Integer.toString(mileage_due);
+
+            holder.lblDueDate.setVisibility(View.VISIBLE);
+            holder.txtDueDate.setVisibility(View.VISIBLE);
+
+            holder.txtDueDate.setText(str);
+
         }
-
-
 
 
         int key_image = maintenance.getImage();
@@ -165,7 +182,7 @@ public class MaintenanceAdapter extends RecyclerView.Adapter<MaintenanceAdapter.
         void onItemClick(Maintenance maintenance, Vehicle auto, String userEmail);
     }
 
-    public String checkgetExistingAlertDate(String email, String licensePlate, String maintenanceType) {
+    public String checkGetExistingAlertDate(String email, String licensePlate, String maintenanceType) {
         String query = "SELECT ALERT_DATE FROM ALERT WHERE EMAIL = ? AND LICENSE_PLATE = ? AND NAME_ALERT = ?";
         String existingDate = null;
 
@@ -203,6 +220,44 @@ public class MaintenanceAdapter extends RecyclerView.Adapter<MaintenanceAdapter.
 
     }
 
+    public int checkGetExistingMileageDue(String email, String licensePlate, String maintenanceType) {
+        String query = "SELECT MILEAGE_DUE FROM ALERT WHERE EMAIL = ? AND LICENSE_PLATE = ? AND NAME_ALERT = ?";
+        int existingMileage = 0;
+
+        MyJDBC jdbc = new MyJDBC();
+        java.sql.Connection con = jdbc.obtenerConexion();
+
+        try (
+                java.sql.PreparedStatement stmt = con.prepareStatement(query)) {
+
+            stmt.setString(1, email);
+            stmt.setString(2, licensePlate);
+            stmt.setString(3, maintenanceType);
+
+            try (java.sql.ResultSet rs = stmt.executeQuery()) {
+                if (rs.next()) {
+                    // Assuming ALERT_DATE is stored as a standard SQL DATE or VARCHAR
+                    existingMileage = rs.getInt("MILEAGE_DUE");
+                    // Convert the String from the DB back into a LocalDate
+
+                    if (existingMileage != 0) {
+                        // We convert it to a LocalDate just to validate/parse it if needed,
+                        // but we return the original string for compatibility with the caller.
+                        // LocalDate existingDate = LocalDate.parse(dateStringResult); // Optional validation
+                        return existingMileage; // Return the valid date string
+                    }
+                }
+            }
+        } catch (Exception e) {
+            // Log the error but return null so the app doesn't crash
+            System.err.println("Error de base de dato durante búsqueda de millaje: " + e.getMessage());
+            e.printStackTrace();
+        }
+
+        return 0;
+
+    }
+
     public void setOnItemClickListener(OnItemClickListener listener) {
         this.listener = listener;
     }
@@ -227,15 +282,16 @@ public class MaintenanceAdapter extends RecyclerView.Adapter<MaintenanceAdapter.
             itemView.setOnClickListener(v -> {
                 int position = getAdapterPosition();
                 if (listener != null && position != RecyclerView.NO_POSITION) {
-                    Maintenance maintenance= (Maintenance) v.getTag(R.id.tag_maintenance);
+                    Maintenance maintenance = (Maintenance) v.getTag(R.id.tag_maintenance);
                     Vehicle vehicle = (Vehicle) v.getTag(R.id.tag_vehicle);
                     String email = (String) v.getTag(R.id.tag_user_email);
 
 
-                    listener.onItemClick(maintenance, vehicle,email);
+                    listener.onItemClick(maintenance, vehicle, email);
                 }
             });
 
         }
     }
+
 }

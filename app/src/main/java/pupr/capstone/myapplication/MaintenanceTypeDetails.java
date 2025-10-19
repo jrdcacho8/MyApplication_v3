@@ -14,6 +14,9 @@ import androidx.core.content.ContextCompat;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import androidx.appcompat.app.AppCompatActivity;
 
+
+import java.sql.Connection;
+import java.sql.PreparedStatement;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.Calendar;
@@ -29,9 +32,14 @@ public class MaintenanceTypeDetails extends AppCompatActivity {
     private FloatingActionButton backButton, editButton;
     private NotificationHelper notificationHelper;
 
-    public boolean edit_token= false;
+    private boolean edit_token= false, mileage_trigger=false, time_trigger=false;
 
-    private LocalDate last_maintenance_date;
+    private String maintenance_type, car_license_plate, userEmail;
+
+    private int daysToAdd, mileage_due, car_mileage;
+
+
+    private LocalDate last_maintenance_date,  alertDate = null;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -57,19 +65,24 @@ public class MaintenanceTypeDetails extends AppCompatActivity {
         requestNotificationPermission();
 
         // --- recibe extras del intent ---
+        // --- recibe extras del intent ---
         Intent intent = getIntent();
-        String maintenance_type = intent.getStringExtra("type");
-        int mileage             = intent.getIntExtra("mileage", 0);
-        int mileageOther        = intent.getIntExtra("mileage_other", 0);
-        int daysToAdd           = intent.getIntExtra("time", 0);
-        String note             = intent.getStringExtra("note");
-        int pictureKey          = intent.getIntExtra("picture", 0);
+        maintenance_type = intent.getStringExtra("type");
+        daysToAdd = intent.getIntExtra("time", 0);
+        car_license_plate = intent.getStringExtra("license_plate");
+        car_mileage = intent.getIntExtra("car_mileage", 0);
+        userEmail = intent.getStringExtra("email");
 
-        String car_brand        =intent.getStringExtra("marca");
-        String car_license_plate=intent.getStringExtra("license_plate");
-        String car_model        =intent.getStringExtra("model");
+        int mileage_rate = intent.getIntExtra("mileage_rate", 0);
+        int mileageOther = intent.getIntExtra("mileage_rate_other", 0);
+        int pictureKey = intent.getIntExtra("picture", 0);
+        String car_brand = intent.getStringExtra("marca");
+        String car_model = intent.getStringExtra("model");
+        String note = intent.getStringExtra("note");
+        int mileage_due = 0;
 
-        String userEmail        =intent.getStringExtra("email");
+
+        checkTriggerofMaintenance(mileage_rate, daysToAdd);
 
         //recibe intent vehicle
         // --- 🔑 New Code: Check Database for Existing Alert Date 🔑 ---
@@ -123,7 +136,41 @@ public class MaintenanceTypeDetails extends AppCompatActivity {
         // DatePickers para fechas (mucho mejor que EditText con inputType)
         txtLastDateMaintenance.setOnClickListener(v -> last_maintenance_date=showDatePicker(txtLastDateMaintenance));
 
+        btnUpdate.setOnClickListener(v -> {
 
+
+            if (edit_token == false) {
+                uploadAlertToDB(alertDate, maintenance_type, userEmail, car_license_plate,getMileage_due());
+                // Por ahora solo cierra o muestra un toast
+                Toast.makeText(this, "Actualizado", Toast.LENGTH_SHORT).show();
+            } else if (edit_token == true) {
+                editAlertToDB(alertDate, maintenance_type, userEmail, car_license_plate,getMileage_due());
+            }
+            // Programar notificación
+            scheduleTestNotification(car_brand, car_model, car_license_plate, maintenance_type);
+
+            // Construir asunto y cuerpo con tu formato
+            String subject = "Alerta de Mantenimiento";
+
+            // Asegúrate de tener disponibles: brand, model, car_license_plate, maintenance_type
+            String body =
+                    "Saludo,\n\n" +
+                            "El Vehiculo " + car_brand + " Tablilla " + car_license_plate + " necesita " + maintenance_type + " el cual vence hoy.";
+
+            // Programar el correo a las 7:00 AM del nextMaintenanceDate
+            NotificationHelper.scheduleMaintenanceEmailAt7am(
+                    this,
+                    alertDate,
+                    userEmail,     // o varios: "a@x.com,b@y.com"
+                    subject,
+                    body
+            );
+
+            Toast.makeText(this,
+                    "Actualizado y correo programado para las 7:00 AM del " + alertDate,
+                    Toast.LENGTH_LONG
+            ).show();
+        });
         // Botón regresar
         backButton.setOnClickListener(v -> {
             finish();
@@ -157,54 +204,64 @@ public class MaintenanceTypeDetails extends AppCompatActivity {
         });
 
         // Actualizar (ejemplo de validación simple)
-        btnUpdate.setOnClickListener(v -> {
 
-            String lastDate = txtLastDateMaintenance.getText().toString().trim();
-            DateTimeFormatter output = DateTimeFormatter.ofPattern("MMM-dd-yyyy", Locale.US);
-            LocalDate mantLastDate = LocalDate.parse(lastDate,output);
-
-            LocalDate nextMaintenanceDate = mantLastDate.plusDays(daysToAdd);//OJO:aqui esta la data necesaria para la alerta de emails y notificaciones
-
-            String formattedDate = nextMaintenanceDate.format(output);
-            txtNextMaintenance.setText(formattedDate);
-
-
-            if (edit_token== false){
-                uploadAlertToDB(nextMaintenanceDate, maintenance_type, userEmail, car_license_plate);
-                // Por ahora solo cierra o muestra un toast
-                Toast.makeText(this, "Actualizado", Toast.LENGTH_SHORT).show();}
-            else if (edit_token= true){
-                editAlertToDB(nextMaintenanceDate, maintenance_type, userEmail, car_license_plate);
-            }
-            // Programar notificación
-            scheduleTestNotification(car_brand, car_model, car_license_plate, maintenance_type);
-
-            // Construir asunto y cuerpo con tu formato
-            String subject = "Alerta de Mantenimiento";
-
-            // Asegúrate de tener disponibles: brand, model, car_license_plate, maintenance_type
-            String body =
-                    "Saludo,\n\n" +
-                            "El Vehiculo " + car_brand + " Tablilla " + car_license_plate + " necesita " + maintenance_type + " el cual vence hoy.";
-
-            // Programar el correo a las 7:00 AM del nextMaintenanceDate
-            NotificationHelper.scheduleMaintenanceEmailAt7am(
-                    this,
-                    nextMaintenanceDate,
-                    userEmail,     // o varios: "a@x.com,b@y.com"
-                    subject,
-                    body
-            );
-
-            Toast.makeText(this,
-                    "Actualizado y correo programado para las 7:00 AM del " + formattedDate,
-                    Toast.LENGTH_LONG
-            ).show();
-        });
     }
 
-    private void scheduleTestNotification(String brand, String model,
-                                          String plate, String maintenanceType) {
+
+    private void checkExistingAlertDate(){
+        LocalDate existingAlertDate = null;
+
+
+        if (maintenance_type != null && car_license_plate != null && userEmail != null) {
+            try {
+
+                // Call the new method to check the database
+                existingAlertDate = getExistingAlertDate(userEmail, car_license_plate, maintenance_type);
+            } catch (Exception e) {
+                // Handle JDBC instantiation error if necessary
+                e.printStackTrace();
+            }
+        }
+
+
+        if (existingAlertDate != null) {
+            // Use the same formatter you plan to use for display
+            DateTimeFormatter output = DateTimeFormatter.ofPattern("MMM-dd-yyyy", Locale.US);
+            String formattedDate = existingAlertDate.format(output);
+
+            txtNextMaintenance.setText(formattedDate);
+
+            // OPTIONAL: Disable the update button if the alert is already set
+            btnUpdate.setEnabled(false);
+            lblLastMaintenance.setVisibility(View.GONE);
+            txtLastDateMaintenance.setVisibility(View.GONE);
+            btnUpdate.setText("Alerta Establecida");
+            Toast.makeText(this, "Alerta ya está establecida para: " + formattedDate, Toast.LENGTH_LONG).show();
+        } else {
+            // Ensure the button is enabled if no alert exists
+            btnUpdate.setEnabled(true);
+            btnUpdate.setText("Actualizar");
+        }
+
+    }
+
+    private void checkTriggerofMaintenance(int mileage, int daysToAdd) {
+
+        if (mileage!=0 && daysToAdd!=0){
+            time_trigger=true;
+            mileage_trigger= true;
+
+        } else if (daysToAdd!=0) {
+            time_trigger=true;
+        }else if(mileage!=0){
+            mileage_trigger= true;
+        }else{
+            time_trigger=false;
+            mileage_trigger= false;
+        }
+    }
+
+    private void scheduleTestNotification(String brand, String model, String plate, String maintenanceType) {
         try {
             // Texto IDENTICO al correo
             String title = "Alerta de Mantenimiento";
@@ -270,18 +327,19 @@ public class MaintenanceTypeDetails extends AppCompatActivity {
         return LocalDate.of(y, m + 1, d); // Return the initial date (M must be 1-based for LocalDate)
     }
 
-    private void uploadAlertToDB(LocalDate alert_date, String maintenance_type, String email, String license_plate){
+    private void uploadAlertToDB(LocalDate alert_date, String maintenance_type, String email, String license_plate, int mileage){
         try {
             MyJDBC jdbc = new MyJDBC();
-            java.sql.Connection con = jdbc.obtenerConexion();
+            Connection con = jdbc.obtenerConexion();
 
             if (con != null) {
-                String query = "INSERT INTO ALERT (EMAIL,LICENSE_PLATE, NAME_ALERT, ALERT_DATE) VALUES (?,?, ?, ?)";
-                java.sql.PreparedStatement stmt = con.prepareStatement(query);
+                String query = "INSERT INTO ALERT (EMAIL,LICENSE_PLATE, NAME_ALERT, ALERT_DATE, MILEAGE_DUE) VALUES (?,?, ?, ?, ?)";
+                PreparedStatement stmt = con.prepareStatement(query);
                 stmt.setString(1, email);
                 stmt.setString(2, license_plate);
                 stmt.setString(3, maintenance_type);
                 stmt.setString(4, alert_date.toString());
+                stmt.setInt(5, mileage);
 
                 int rows = stmt.executeUpdate();
 
@@ -307,19 +365,21 @@ public class MaintenanceTypeDetails extends AppCompatActivity {
 
 
     }
+
     // --- Inside MyJDBC.java ---
-    private void editAlertToDB(LocalDate alert_date, String maintenance_type, String email, String license_plate){
+    private void editAlertToDB(LocalDate alert_date, String maintenance_type, String email, String license_plate, int mileage){
         try {
             MyJDBC jdbc = new MyJDBC();
-            java.sql.Connection con = jdbc.obtenerConexion();
+            Connection con = jdbc.obtenerConexion();
 
             if (con != null) {
-                String query = "UPDATE ALERT SET ALERT_DATE = ? WHERE NAME_ALERT = ? AND EMAIL = ? AND LICENSE_PLATE = ?";
-                java.sql.PreparedStatement stmt = con.prepareStatement(query);
+                String query = "UPDATE ALERT SET ALERT_DATE = AND MILEAGE_DUE = ? WHERE NAME_ALERT = ? AND EMAIL = ? AND LICENSE_PLATE = ?";
+                PreparedStatement stmt = con.prepareStatement(query);
                 stmt.setString(1, alert_date.toString());
-                stmt.setString(2, maintenance_type);
-                stmt.setString(3, email);
-                stmt.setString(4, license_plate);
+                stmt.setInt(2, mileage);
+                stmt.setString(3, maintenance_type);
+                stmt.setString(4, email);
+                stmt.setString(5, license_plate);
 
                 int rows = stmt.executeUpdate();
 
@@ -345,6 +405,7 @@ public class MaintenanceTypeDetails extends AppCompatActivity {
 
 
     }
+
 
 
     public LocalDate getExistingAlertDate(String email, String licensePlate, String maintenanceType) {
@@ -399,6 +460,8 @@ public class MaintenanceTypeDetails extends AppCompatActivity {
             default: return R.drawable.generalmaintenance;
         }
     }
+
+    public int getMileage_due() {
+        return mileage_due;
+    }
 }
-
-

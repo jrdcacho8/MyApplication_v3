@@ -67,6 +67,7 @@ public class GarageActivity extends AppCompatActivity {
                 intent.putExtra("license_plate", autos.getLicense_plate());
                 intent.putExtra("model", autos.getModel());
                 intent.putExtra("email", userEmail);
+                intent.putExtra("car_mileage", autos.getMileage());
 
 
                 startActivity(intent);
@@ -86,28 +87,29 @@ public class GarageActivity extends AppCompatActivity {
             Connection connection = myJDBC.obtenerConexion();
 
             if (connection != null) {
-                String query = "SELECT BRAND, MODEL, LICENSE_PLATE, IMAGEN FROM VEHICULO WHERE EMAIL = ?";
+                String query = "SELECT BRAND, MODEL, YEAR, LICENSE_PLATE, IMAGE, MILEAGE FROM VEHICLE WHERE EMAIL = ?";
                 PreparedStatement statement = connection.prepareStatement(query);
                 statement.setString(1, email);
                 ResultSet rs = statement.executeQuery();
 
                 while (rs.next()) {
                     String marca = rs.getString("BRAND");
-                    String modelo = rs.getString("MODEL");
+                    String model = rs.getString("MODEL");
+                    int year = rs.getInt("YEAR");
                     String tablilla = rs.getString("LICENSE_PLATE");
-
                     // Combinar marca y modelo en "nombre"
-                    String nombre = marca + " " + modelo;
+                    //String nombre = marca + " " + model;//ojo por eso sale null en garageactvity title of layout
 
                     // Obtener imagen como BLOB
-                    byte[] imagenBytes = rs.getBytes("IMAGEN");
+                    byte[] imagenBytes = rs.getBytes("IMAGE");
+                    int mileage = rs.getInt("MILEAGE");
                     Bitmap bitmap = null;
                     if (imagenBytes != null && imagenBytes.length > 0) {
                         bitmap = BitmapFactory.decodeByteArray(imagenBytes, 0, imagenBytes.length);
                     }
 
                     // Agregar a la lista
-                    autos.add(new Vehicle(nombre, tablilla, bitmap));
+                    autos.add(new Vehicle(marca,model, tablilla,year, bitmap, mileage));
                 }
 
 
@@ -130,7 +132,7 @@ public class GarageActivity extends AppCompatActivity {
 
         try (Connection connection = myJDBC1.obtenerConexion()) {
             if (connection != null) {
-                String query = "SELECT NAME FROM USUARIO WHERE EMAIL = ?";
+                String query = "SELECT NAME FROM USER WHERE EMAIL = ?";
                 try (PreparedStatement stmt = connection.prepareStatement(query)) {
                     stmt.setString(1, email);
 

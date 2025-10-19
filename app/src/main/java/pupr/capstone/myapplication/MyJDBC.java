@@ -15,7 +15,7 @@ public class MyJDBC {
     String uname, pass, ip, port, database;
 
     public Connection obtenerConexion() {
-
+/*
 
         ip = "192.168.0.29";
         port = "3306";
@@ -23,13 +23,13 @@ public class MyJDBC {
         uname = "root";
         pass = "Eecf#0819";
 
-/*
+*/
         ip = "10.0.0.64";
         port = "3306";
-        database = "Test";
+        database = "al_dia_app";
         uname = "root";
         pass = "C@pstoneAJE3";
-*/
+
         //php -Que es un api (intermediario entre applicación)
         //firebase sera un api?
         StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();

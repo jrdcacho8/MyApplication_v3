@@ -56,7 +56,7 @@ public class ProfileActivity extends AppCompatActivity {
                 Connection connection = myJDBC.obtenerConexion();
 
                 if (connection != null) {
-                    String query = "INSERT INTO USUARIO (NAME, EMAIL, PASSWORD) VALUES (?, ?, ?)";
+                    String query = "INSERT INTO USER (NAME, EMAIL, PASSWORD) VALUES (?, ?, ?)";
                     PreparedStatement stmt = connection.prepareStatement(query);
                     stmt.setString(1, name);
                     stmt.setString(2, email);

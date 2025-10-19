@@ -109,7 +109,7 @@ public class MainActivity extends AppCompatActivity {
             Connection connection = myJDBC.obtenerConexion();
 
             if (connection != null) {
-                String query = "SELECT * FROM USUARIO WHERE EMAIL = ? AND PASSWORD = ?";
+                String query = "SELECT * FROM USER WHERE EMAIL = ? AND PASSWORD = ?";
                 java.sql.PreparedStatement statement = connection.prepareStatement(query);
                 statement.setString(1, userEmail);
                 statement.setString(2, userPass);
@@ -204,7 +204,7 @@ public class MainActivity extends AppCompatActivity {
 
                 // Ajusta los nombres de columnas/tabla a tu esquema real.
                 // Requiere que EMAIL sea UNIQUE/PRIMARY KEY en USUARIO.
-                String sql = "INSERT INTO USUARIO (EMAIL, NAME, PASSWORD, PROVIDER) " +
+                String sql = "INSERT INTO USER (EMAIL, NAME, PASSWORD, PROVIDER) " +
                         "VALUES (?, ?, NULL, 'google') " +
                         "ON DUPLICATE KEY UPDATE NAME = VALUES(NAME), PROVIDER = 'google'";
 

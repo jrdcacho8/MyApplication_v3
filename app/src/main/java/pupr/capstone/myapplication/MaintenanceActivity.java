@@ -46,25 +46,21 @@ public class MaintenanceActivity extends AppCompatActivity {
         String marca = getIntent().getStringExtra("marca");
         String license_plate = getIntent().getStringExtra("license_plate");
         String model = getIntent().getStringExtra("model");
+        int car_mileage = getIntent().getIntExtra("car_mileage",0);
 
         String email =getIntent().getStringExtra("email");
 
         //Set Title of activity_maintenance according to selected vehicle
 
-        textActivityMaintenance.setText(String.join(" ", marca, license_plate));
+        textActivityMaintenance.setText(String.join(" ", marca,model, license_plate));
 
+        cargarMantenimientosDesdeBD(marca);
 
-
-        car= new Vehicle(marca, license_plate,model);
+        car= new Vehicle(marca, license_plate,model,car_mileage);
 
         adapter = new MaintenanceAdapter(listaMaintenances,car, email);
         recyclerView.setAdapter(adapter);
 
-        // Cargar mantenimientos de la BD usando la marca como nombre de tabla
-        cargarMantenimientosDesdeBD(marca);
-
-       //Maintenance maintenance= new Maintenance(listaMaintenances.get(0));
-        //Escrito por Esdras
 
         // Manejar el clic de cada item
         adapter.setOnItemClickListener(new MaintenanceAdapter.OnItemClickListener() {
@@ -85,8 +81,8 @@ public class MaintenanceActivity extends AppCompatActivity {
 
                 // Ajusta los nombres de getters según tu clase Maintenance
                 intent.putExtra("type", listaMaintenances.getMaintenance());
-                intent.putExtra("mileage", listaMaintenances.getMileageRate());
-                intent.putExtra("mileage_other", listaMaintenances.getMileageRateOther());
+                intent.putExtra("mileage_rate", listaMaintenances.getMileageRate());
+                intent.putExtra("mileage_rate_other", listaMaintenances.getMileageRateOther());
                 intent.putExtra("time", listaMaintenances.getTimeRate());
                 intent.putExtra("note", listaMaintenances.getNote());
                 intent.putExtra("picture", listaMaintenances.getImage());
@@ -95,6 +91,7 @@ public class MaintenanceActivity extends AppCompatActivity {
                 intent.putExtra("marca",car.getBrand());
                 intent.putExtra("license_plate",car.getLicense_plate());
                 intent.putExtra("model", car.getModel());
+                intent.putExtra("car_mileage", car.getMileage());
 
                 //User email
                 intent.putExtra("email",email);
@@ -141,7 +138,7 @@ public class MaintenanceActivity extends AppCompatActivity {
                         case "Aceite de Motor Sintético":
                             maintenance_picture = 2;
                             break;
-                        case "Presión y profundidad de los neumáticos":
+                        case "Presión y profundidad de los gomas":
                             maintenance_picture = 3;
                             break;
                         case "Cambio de escobillas del limpiaparabrisas":

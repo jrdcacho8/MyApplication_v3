@@ -211,7 +211,7 @@ public class AddCar extends AppCompatActivity {
             java.sql.Connection con = jdbc.obtenerConexion();
 
             if (con != null) {
-                String query = "INSERT INTO VEHICULO (YEAR, MODEL, COLOR, MILLEAGE, LICENSE_PLATE, IMAGEN, EMAIL, BRAND) VALUES (?,?, ?, ?, ?, ?, ?, ?)";
+                String query = "INSERT INTO VEHICLE (YEAR, MODEL, COLOR, MILEAGE, LICENSE_PLATE, IMAGE, EMAIL, BRAND) VALUES (?,?, ?, ?, ?, ?, ?, ?)";
                 java.sql.PreparedStatement stmt = con.prepareStatement(query);
                 stmt.setInt(1, Integer.parseInt(year));
                 stmt.setString(2, modelo);
