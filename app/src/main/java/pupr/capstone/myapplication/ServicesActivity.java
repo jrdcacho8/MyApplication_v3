@@ -1,5 +1,6 @@
 package pupr.capstone.myapplication;
 
+import android.app.AlertDialog;
 import android.app.DatePickerDialog;
 import android.content.Intent;
 import android.net.Uri;
@@ -16,10 +17,7 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.List;
-import java.util.Locale;
+import java.util.*;
 
 public class ServicesActivity extends AppCompatActivity {
 
@@ -121,7 +119,7 @@ public class ServicesActivity extends AppCompatActivity {
                 Connection connection = myJDBC.obtenerConexion();
 
                 if (connection != null) {
-                    String query = "SELECT BRAND, MODEL, LICENSE_PLATE FROM VEHICULO WHERE EMAIL = ? ORDER BY BRAND, MODEL";
+                    String query = "SELECT BRAND, MODEL, LICENSE_PLATE FROM VEHICLE WHERE EMAIL = ? ORDER BY BRAND, MODEL";
                     PreparedStatement statement = connection.prepareStatement(query);
                     statement.setString(1, userEmail);
                     ResultSet rs = statement.executeQuery();
@@ -195,9 +193,11 @@ public class ServicesActivity extends AppCompatActivity {
 
     private void setupSpinner() {
         String[] tiposMantenimiento = {
-                "Seleccionar tipo...", "Aceite de Motor", "Coolant/Anticongelante",
-                "Rotación de Gomas", "Filtro de Aire", "Sistema de Frenos","Otro"
+                "Seleccionar tipo...", "Cambio de Aceite de Motor", "Reemplazo de 'Coolant'('Flushing')",
+                "Rotación de Gomas", "Alineamiento de gomas","Reemplazo de Gomas", "Reemplazo de Discos y/o Frenos","Otro"
         };
+        // We use an ArrayList for the data source so we can add new items dynamically
+        List<String> tiposMantenimientoList = new ArrayList<>(Arrays.asList(tiposMantenimiento));
         ArrayAdapter<String> adapter = new ArrayAdapter<>(
                 this, android.R.layout.simple_spinner_item, tiposMantenimiento);
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
@@ -207,12 +207,20 @@ public class ServicesActivity extends AppCompatActivity {
         spinnerTipo.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override public void onItemSelected(AdapterView<?> parent, View view, int pos, long id) {
                 String tipo = parent.getItemAtPosition(pos).toString();
-                formulario.setTipoMantenimiento(
-                        "Seleccionar tipo...".equals(tipo) ? null : tipo
-                );
+                if ("Otro".equals(tipo)) {
+                    // If the user selects "Otro", show the input dialog
+                    showCustomTypeInputDialog(tiposMantenimientoList, adapter);
+                } else {
+                    // For any fixed selection, update the form
+                    formulario.setTipoMantenimiento(
+                            "Seleccionar tipo...".equals(tipo) ? null : tipo
+                    );
+                }
                 mostrarErrores();
             }
-            @Override public void onNothingSelected(AdapterView<?> parent) {}
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {}
         });
     }
     abstract class SimpleTextWatcher implements android.text.TextWatcher {
@@ -262,7 +270,7 @@ public class ServicesActivity extends AppCompatActivity {
 
                 if (connection != null) {
                     // Asegúrate de que estas columnas existen exactamente así en tu tabla
-                    String sql = "INSERT INTO SERVICIO " +
+                    String sql = "INSERT INTO SERVICE " +
                             "(SERVICE_TYPE, EMAIL, LICENSE_PLATE, DESCRIPTION, COST_SERVICE, COMPANY_SERVICE, DATE_SERVICE) " +
                             "VALUES (?, ?, ?, ?, ?, ?, ?)";
 
@@ -393,5 +401,60 @@ public class ServicesActivity extends AppCompatActivity {
         if (receiptImage != null) {
             receiptImage.setImageDrawable(null);
         }
+    }
+
+    /**
+     * Muestra un AlertDialog con un campo EditText para que el usuario introduzca un
+     * tipo de mantenimiento personalizado y lo añade al Spinner.
+     * @param dataList La lista de opciones del Spinner
+     * @param adapter El adaptador del Spinner
+     */
+    private void showCustomTypeInputDialog(List<String> dataList, ArrayAdapter<String> adapter) {
+        // Necesitamos una referencia a la última opción seleccionada para restaurarla si el usuario cancela
+        final int lastPosition = spinnerTipo.getSelectedItemPosition();
+
+        // Crear el EditText para la entrada del usuario
+        final EditText input = new EditText(this);
+        input.setHint("Ej. Reemplazo de Filtro de Aire");
+
+        new AlertDialog.Builder(this)
+                .setTitle("Tipo de Mantenimiento Personalizado")
+                .setMessage("Introduce el nuevo tipo de servicio:")
+                .setView(input) // Añadir el EditText al diálogo
+                .setPositiveButton("Añadir", (dialog, whichButton) -> {
+                    String customOption = input.getText().toString().trim();
+
+                    if (!customOption.isEmpty()) {
+                        // 1. Insertar la nueva opción ANTES de "Otro"
+                        // Esto mantiene a "Otro" siempre al final
+                        int otroIndex = dataList.indexOf("Otro");
+                        if (otroIndex != -1) {
+                            dataList.add(otroIndex, customOption);
+                        } else {
+                            dataList.add(customOption); // En caso de que "Otro" no se encuentre
+                        }
+
+                        // 2. Notificar al adaptador para que actualice el Spinner
+                        adapter.notifyDataSetChanged();
+
+                        // 3. Establecer el nuevo elemento como la selección actual
+                        spinnerTipo.setSelection(dataList.indexOf(customOption));
+
+                        // 4. Actualizar el formulario con el nuevo tipo
+                        formulario.setTipoMantenimiento(customOption);
+
+                        Toast.makeText(this, "Tipo de servicio añadido: " + customOption, Toast.LENGTH_LONG).show();
+                    } else {
+                        Toast.makeText(this, "El campo no puede estar vacío.", Toast.LENGTH_SHORT).show();
+                        // Si el usuario deja vacío, forzamos la selección a volver al elemento anterior
+                        spinnerTipo.setSelection(lastPosition);
+                    }
+                })
+                .setNegativeButton("Cancelar", (dialog, whichButton) -> {
+                    // Si el usuario cancela, volvemos a la opción que estaba seleccionada antes de "Otro"
+                    spinnerTipo.setSelection(lastPosition);
+                    dialog.cancel();
+                })
+                .show();
     }
 }

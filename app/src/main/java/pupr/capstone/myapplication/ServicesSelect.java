@@ -162,7 +162,7 @@ public class ServicesSelect extends AppCompatActivity {
                 try (Connection cn = myJDBC.obtenerConexion()) {
                     if (cn != null) {
                         // Si no tienes YEAR, quítalo del SELECT
-                        String sql = "SELECT BRAND, MODEL, LICENSE_PLATE, IMAGEN, YEAR FROM VEHICULO WHERE EMAIL = ? ORDER BY BRAND, MODEL";
+                        String sql = "SELECT BRAND, MODEL, LICENSE_PLATE, IMAGE, YEAR FROM VEHICLE WHERE EMAIL = ? ORDER BY BRAND, MODEL";
                         try (PreparedStatement ps = cn.prepareStatement(sql)) {
                             ps.setString(1, userEmail);
                             try (ResultSet rs = ps.executeQuery()) {

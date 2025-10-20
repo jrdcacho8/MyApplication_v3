@@ -105,8 +105,8 @@ public final class VehicleReportExporter {
     /** Consulta SERVICIO por EMAIL y LICENSE_PLATE. Ajusta nombres si difieren en tu DB. */
     private static List<ServiceRow> queryServices(String email, String plate) {
         List<ServiceRow> out = new ArrayList<>();
-        String sql = "SELECT DATE_SERVICE, SERVICE_TYPE, COST_SERVICE " +
-                "FROM SERVICIO " +
+        String sql = "SELECT DATE_SERVICE, SERVICE_TYPE, COMPANY_SERVICE, COST_SERVICE " +
+                "FROM SERVICE " +
                 "WHERE EMAIL = ? AND LICENSE_PLATE = ? " +
                 "ORDER BY DATE_SERVICE ASC";
 
@@ -120,9 +120,10 @@ public final class VehicleReportExporter {
                 while (rs.next()) {
                     java.sql.Date d = rs.getDate("DATE_SERVICE");
                     String type = rs.getString("SERVICE_TYPE");
+                    String company = rs.getString("COMPANY_SERVICE");
                     BigDecimal cost = rs.getBigDecimal("COST_SERVICE");
                     out.add(new ServiceRow(d != null ? new Date(d.getTime()) : null,
-                            safe(type),
+                             safe(company),safe(type),
                             cost != null ? cost : BigDecimal.ZERO));
                 }
             }
@@ -190,12 +191,14 @@ public final class VehicleReportExporter {
         // Tabla
         // Columnas: Fecha | Servicio | Costo (alinear costo a la derecha)
         int colFechaX = margin;
-        int colServicioX = margin + 150;     // espacio para fecha
+        int colServicioX1 = margin + 150;     // espacio para fecha
+        int colServicioX2 = margin + 300;
         int colCostoRight = pageW - margin;  // dibujamos costo alineado a la derecha
 
         // Encabezados de tabla
         canvas.drawText("Fecha", colFechaX, y, bold);
-        canvas.drawText("Servicio", colServicioX, y, bold);
+        canvas.drawText("Servicio", colServicioX1, y, bold);
+        canvas.drawText("Compañía", colServicioX2, y, bold);
         drawRightText(canvas, "Costo", colCostoRight, y, bold);
         y += 10;
         canvas.drawLine(margin, y, pageW - margin, y, line);
@@ -210,10 +213,10 @@ public final class VehicleReportExporter {
 
         BigDecimal total = BigDecimal.ZERO;
         int rowGap = 8;
-        int maxServicioWidth = colCostoRight - colServicioX - 8;
+        int maxServicioWidth = colCostoRight - colServicioX1 - 8;
 
         if (rows == null || rows.isEmpty()) {
-            canvas.drawText("No hay servicios registrados", colServicioX, y, normal);
+            canvas.drawText("No hay servicios registrados", colServicioX1, y, normal);
             y += 18;
         } else {
             for (ServiceRow r : rows) {
@@ -222,6 +225,10 @@ public final class VehicleReportExporter {
 
                 // Servicio (posible multilínea)
                 List<String> servicioLines = breakTextLines(r.service, bold, maxServicioWidth);
+
+                // Compañía (posible multilínea) 🌟 NEW: Calculate lines for Company
+                List<String> companyLines = breakTextLines(r.company, bold, colCostoRight - colServicioX2 - 8);
+                // Note: The max width for Company is the space up to Cost's right edge (colCostoRight)
 
                 // Costo
                 String costTxt = money.format(r.cost != null ? r.cost : BigDecimal.ZERO);
@@ -232,20 +239,27 @@ public final class VehicleReportExporter {
                 int lineHNormal = fmNormal.descent - fmNormal.ascent;
                 int lineHBold   = fmBold.descent   - fmBold.ascent;
 
-                // altura de la fila = max(fecha, servicio multi-línea)
-                int rowHeight = Math.max(lineHNormal, servicioLines.size() * lineHBold);
+                // altura de la fila = max(fecha, servicio multi-línea, compañía multi-línea) 🌟 UPDATED: Max with Company
+                int maxLines = Math.max(servicioLines.size(), companyLines.size());
+                int rowHeight = Math.max(lineHNormal, maxLines * lineHBold);
 
                 // Dibujar: Fecha (alineada arriba de la fila)
-                // Nota: 'y' es la línea base. Para colocar el texto en la parte alta visual,
-                // restamos 'ascent' (que es negativo) desde 'y'.
                 int baseFecha = y - fmNormal.ascent;
                 canvas.drawText(fechaTxt, colFechaX, baseFecha, normal);
 
                 // Servicio multilínea
-                int sy = y - fmBold.ascent;  // línea base de la primera línea de servicio
+                int sy = y - fmBold.ascent;  // línea base para el texto del servicio/compañía
+                int syService = sy;
                 for (String part : servicioLines) {
-                    canvas.drawText(part, colServicioX, sy, bold);
-                    sy += lineHBold;
+                    canvas.drawText(part, colServicioX1, syService, bold);
+                    syService += lineHBold;
+                }
+
+                // Compañía multilínea 🌟 NEW: Draw Company Text
+                int syCompany = sy;
+                for (String part : companyLines) {
+                    canvas.drawText(part, colServicioX2, syCompany, bold);
+                    syCompany += lineHBold;
                 }
                 total = total.add(r.cost != null ? r.cost : BigDecimal.ZERO);
                 // Costo (alineado a la derecha, altura de la primera línea)
@@ -271,7 +285,7 @@ public final class VehicleReportExporter {
         // Total
         y += 6;
         Paint totalPaint = makePaint(Color.BLACK, 13f, true);
-        canvas.drawText("Total", colServicioX, y, totalPaint);
+        canvas.drawText("Total", colServicioX1, y, totalPaint);
         drawRightText(canvas, money.format(total), colCostoRight, y, totalPaint);
 
         pdf.finishPage(page);
@@ -374,10 +388,10 @@ public final class VehicleReportExporter {
 
     private static class ServiceRow {
         final Date date;
-        final String service;
+        final String service, company;
         final BigDecimal cost;
-        ServiceRow(Date d, String s, BigDecimal c) {
-            this.date = d; this.service = s; this.cost = c;
+        ServiceRow(Date d, String b,String s, BigDecimal c) {
+            this.date = d;this.company=b; this.service = s; this.cost = c;
         }
     }
 }

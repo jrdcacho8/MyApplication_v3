@@ -84,39 +84,10 @@ public class MaintenanceTypeDetails extends AppCompatActivity {
 
         checkTriggerofMaintenance(mileage_rate, daysToAdd);
 
+        checkExistingAlertDate();
+
         //recibe intent vehicle
         // --- 🔑 New Code: Check Database for Existing Alert Date 🔑 ---
-        LocalDate existingAlertDate = null;
-        if (maintenance_type != null && car_license_plate != null && userEmail != null) {
-            try {
-
-                // Call the new method to check the database
-                existingAlertDate = getExistingAlertDate(userEmail, car_license_plate, maintenance_type);
-            } catch (Exception e) {
-                // Handle JDBC instantiation error if necessary
-                e.printStackTrace();
-            }
-        }
-
-
-        if (existingAlertDate != null) {
-            // Use the same formatter you plan to use for display
-            DateTimeFormatter output = DateTimeFormatter.ofPattern("MMM-dd-yyyy", Locale.US);
-            String formattedDate = existingAlertDate.format(output);
-
-            txtNextMaintenance.setText(formattedDate);
-
-            // OPTIONAL: Disable the update button if the alert is already set
-            lblLastMaintenance.setVisibility(View.GONE);
-            txtLastDateMaintenance.setVisibility(View.GONE);
-            btnUpdate.setEnabled(false);
-            btnUpdate.setText("Alerta Establecida");
-            Toast.makeText(this, "Alerta ya está establecida para: " + formattedDate, Toast.LENGTH_LONG).show();
-        } else {
-            // Ensure the button is enabled if no alert exists
-            btnUpdate.setEnabled(true);
-            btnUpdate.setText("Actualizar");
-        }
 
         // ... (Rest of your onCreate methods) ...
 
@@ -138,38 +109,26 @@ public class MaintenanceTypeDetails extends AppCompatActivity {
 
         btnUpdate.setOnClickListener(v -> {
 
-
+//***dISCRIMINAR AQUI DE ACUERDO A ALERTA, SI ES POR TIEMPO POR MILLAJE O AMBAS
             if (edit_token == false) {
                 uploadAlertToDB(alertDate, maintenance_type, userEmail, car_license_plate,getMileage_due());
                 // Por ahora solo cierra o muestra un toast
+                scheduleTestNotification( car_brand, car_license_plate, maintenance_type);
+
+                scheduleNotificationManagement(car_brand,car_model,maintenance_type, car_license_plate, alertDate,userEmail);
+
                 Toast.makeText(this, "Actualizado", Toast.LENGTH_SHORT).show();
             } else if (edit_token == true) {
                 editAlertToDB(alertDate, maintenance_type, userEmail, car_license_plate,getMileage_due());
+
+                scheduleTestNotification( car_brand, car_license_plate, maintenance_type);
+
+                scheduleNotificationManagement(car_brand,car_model,maintenance_type, car_license_plate, alertDate,userEmail);
             }
             // Programar notificación
-            scheduleTestNotification(car_brand, car_model, car_license_plate, maintenance_type);
 
-            // Construir asunto y cuerpo con tu formato
-            String subject = "Alerta de Mantenimiento";
 
-            // Asegúrate de tener disponibles: brand, model, car_license_plate, maintenance_type
-            String body =
-                    "Saludo,\n\n" +
-                            "El Vehiculo " + car_brand + " Tablilla " + car_license_plate + " necesita " + maintenance_type + " el cual vence hoy.";
 
-            // Programar el correo a las 7:00 AM del nextMaintenanceDate
-            NotificationHelper.scheduleMaintenanceEmailAt7am(
-                    this,
-                    alertDate,
-                    userEmail,     // o varios: "a@x.com,b@y.com"
-                    subject,
-                    body
-            );
-
-            Toast.makeText(this,
-                    "Actualizado y correo programado para las 7:00 AM del " + alertDate,
-                    Toast.LENGTH_LONG
-            ).show();
         });
         // Botón regresar
         backButton.setOnClickListener(v -> {
@@ -248,36 +207,31 @@ public class MaintenanceTypeDetails extends AppCompatActivity {
     private void checkTriggerofMaintenance(int mileage, int daysToAdd) {
 
         if (mileage!=0 && daysToAdd!=0){
-            time_trigger=true;
-            mileage_trigger= true;
+            this.time_trigger=true;
+            this.mileage_trigger= true;
 
         } else if (daysToAdd!=0) {
-            time_trigger=true;
+            this.time_trigger=true;
         }else if(mileage!=0){
-            mileage_trigger= true;
-        }else{
-            time_trigger=false;
-            mileage_trigger= false;
+            this.mileage_trigger= true;
         }
     }
 
-    private void scheduleTestNotification(String brand, String model, String plate, String maintenanceType) {
+    private void scheduleTestNotification(String car_brand,  String plate, String maintenanceType) {
         try {
-            // Texto IDENTICO al correo
-            String title = "Alerta de Mantenimiento";
-            String message =
-                    "Saludo,\n\n" +
-                            "El Vehiculo " + brand + " " + model +
-                            " Tablilla " + plate +
-                            " necesita " + maintenanceType +
-                            " el cual vence hoy.";
+            String subject = "Alerta de Mantenimiento";
 
+            // Asegúrate de tener disponibles: brand, model, car_license_plate, maintenance_type
+            String body =
+                    "Saludo,\n\n" +
+                            "El Vehiculo " + car_brand + " Tablilla " + car_license_plate +
+                            " necesita " + maintenance_type + " el cual vence hoy.";
             // Dispara en 10s para probar
             Calendar calendar = Calendar.getInstance();
             calendar.add(Calendar.SECOND, 10);
             long time = calendar.getTimeInMillis();
 
-            notificationHelper.scheduleNotification(time, title, message);
+            notificationHelper.scheduleNotification(time, subject, body);
 
         } catch (Exception e) {
             e.printStackTrace();
@@ -295,6 +249,40 @@ public class MaintenanceTypeDetails extends AppCompatActivity {
                 );
             }
         }
+    }
+
+    public void scheduleNotificationManagement(String brand,String model,String maintenanceType, String plate,LocalDate alertDate, String userEmail){
+
+        // Construir asunto y cuerpo con tu formato
+        String title = "⚠️ Recordatorio Urgente de Mantenimiento - AL DIA APP";
+        String message =
+                "**Estimado(a) usuario(a),**\n\n" +
+                        "El **Equipo de AL DIA APP** le envía esta importante notificación para recordarle que " +
+                        "su vehículo requiere una atención inmediata.\n\n" +
+                        "**Detalles del Vehículo y Mantenimiento:**\n" +
+                        "Vehículo: **" + brand + " " + model + "**\n" +
+                        "Tablilla: **" + plate + "**\n" +
+                        "Mantenimiento Requerido: **" + maintenanceType + "**\n" +
+                        "Estado: **Vence Hoy**.\n\n" +
+                        "Para garantizar el rendimiento óptimo, la seguridad y la validez de su garantía, " +
+                        "le solicitamos **programar este servicio lo antes posible**.\n\n" +
+                        "Agradecemos su atención y le deseamos un excelente día.\n\n" +
+                        "Saludos cordiales,\n" +
+                        "El Equipo de AL DIA APP";
+
+        // Programar el correo a las 7:00 AM del nextMaintenanceDate
+        NotificationHelper.scheduleMaintenanceEmailAt7am(
+                this,
+                alertDate,
+                userEmail,     // o varios: "a@x.com,b@y.com"
+                title,
+                message
+        );
+
+        Toast.makeText(this,
+                "Actualizado y correo programado para las 7:00 AM del " + alertDate,
+                Toast.LENGTH_LONG
+        ).show();
     }
     private LocalDate showDatePicker(EditText target) {
         // 1. Get the current date to initialize the DatePickerDialog
@@ -405,6 +393,8 @@ public class MaintenanceTypeDetails extends AppCompatActivity {
 
 
     }
+
+
 
 
 
