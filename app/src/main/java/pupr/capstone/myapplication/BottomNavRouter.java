@@ -69,8 +69,8 @@ public final class BottomNavRouter {
            // return AlertsActivity.class;      // <-- cámbiala si tu clase se llama distinto
         } else if (menuItemId == R.id.nav_informe) {
             return ServicesSelect.class;      // pantalla “Informe”
-        //} else if (menuItemId == R.id.nav_perfil) {
-         //   return ProfileActivity.class;     // <-- cámbiala si tu clase se llama distinto
+        } else if (menuItemId == R.id.nav_perfil) {
+            return UserActivity.class;     // <-- cámbiala si tu clase se llama distinto
         }
         return null;
     }

@@ -9,6 +9,7 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ProgressBar;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
@@ -63,6 +64,8 @@ public class MainActivity extends AppCompatActivity {
     Connection connect;
     String ConnectionResult="";
 
+    ProgressBar progressBar;
+
     // 🌐 Google Sign In
     private static final int RC_SIGN_IN = 9001;
     private GoogleSignInClient mGoogleSignInClient;
@@ -89,55 +92,78 @@ public class MainActivity extends AppCompatActivity {
         // Botón Google
         Button googleButton = findViewById(R.id.google_signIn);
         googleButton.setOnClickListener(v -> signIn());
+
+        progressBar = findViewById(R.id.progressBar);
     }
 
     public void handleAccess(View v){
         EditText emailInput = findViewById(R.id.editTextEmailAddress);
-        EditText passInput = findViewById(R.id.editTextPassword);
+        EditText passInput  = findViewById(R.id.editTextPassword);
 
         String userEmail = emailInput.getText().toString().trim();
-        String userPass = passInput.getText().toString().trim();
-        String userName= null;
-        // Validación básica
+        String userPass  = passInput.getText().toString().trim();
+
+        // 1) Validación ANTES de mostrar el loader
         if (userEmail.isEmpty() || userPass.isEmpty()) {
             Toast.makeText(this, "Completa todos los campos", Toast.LENGTH_SHORT).show();
             return;
         }
 
-        try {
-            MyJDBC myJDBC = new MyJDBC();
-            Connection connection = myJDBC.obtenerConexion();
+        // 2) UI: mostrar loader y bloquear botón
+        progressBar.setVisibility(View.VISIBLE);
+        v.setEnabled(false);
 
-            if (connection != null) {
-                String query = "SELECT * FROM USER WHERE EMAIL = ? AND PASSWORD = ?";
-                java.sql.PreparedStatement statement = connection.prepareStatement(query);
-                statement.setString(1, userEmail);
-                statement.setString(2, userPass);
+        // 3) Ejecutar la consulta en un hilo secundario
+        new Thread(() -> {
+            boolean ok = false;
+            String errorMsg = null;
+            try {
+                MyJDBC myJDBC = new MyJDBC();
+                Connection connection = myJDBC.obtenerConexion();
 
-                java.sql.ResultSet resultSet = statement.executeQuery();
-
-                if (resultSet.next()) {
-                    // Usuario autenticado con éxito
-                    Toast.makeText(this, "Acceso concedido", Toast.LENGTH_SHORT).show();
-                    Intent i = new Intent(this, GarageActivity.class);
-                    i.putExtra("email",userEmail);
-                    startActivity(i);
+                if (connection != null) {
+                    String query = "SELECT 1 FROM `USER` WHERE `EMAIL` = ? AND `PASSWORD` = ?"; // usa backticks
+                    try (java.sql.PreparedStatement statement = connection.prepareStatement(query)) {
+                        statement.setString(1, userEmail);
+                        statement.setString(2, userPass);
+                        try (java.sql.ResultSet rs = statement.executeQuery()) {
+                            ok = rs.next();
+                        }
+                    }
+                    connection.close();
                 } else {
-                    Toast.makeText(this, "Correo o contraseña incorrectos", Toast.LENGTH_SHORT).show();
+                    errorMsg = "Error de conexión a la base de datos";
                 }
+            } catch (Exception e) {
+                e.printStackTrace();
+                errorMsg = "Error: " + e.getMessage();
+            } finally {
+                boolean finalOk = ok;
+                String finalError = errorMsg;
 
-                resultSet.close();
-                statement.close();
-                connection.close();
-            } else {
-                Toast.makeText(this, "Error de conexión a la base de datos", Toast.LENGTH_SHORT).show();
+                // 4) Volver a UI SIEMPRE para ocultar loader y seguir
+                runOnUiThread(() -> {
+                    progressBar.setVisibility(View.GONE);
+                    v.setEnabled(true);
+
+                    if (finalError != null) {
+                        Toast.makeText(this, finalError, Toast.LENGTH_LONG).show();
+                        return;
+                    }
+
+                    if (finalOk) {
+                        Toast.makeText(this, "Acceso concedido", Toast.LENGTH_SHORT).show();
+                        Intent i = new Intent(this, GarageActivity.class);
+                        i.putExtra("email", userEmail);
+                        startActivity(i);
+                    } else {
+                        Toast.makeText(this, "Correo o contraseña incorrectos", Toast.LENGTH_SHORT).show();
+                    }
+                });
             }
-
-        } catch (Exception e) {
-            e.printStackTrace();
-            Toast.makeText(this, "Error: " + e.getMessage(), Toast.LENGTH_LONG).show();
-        }
+        }).start();
     }
+
     public void handleCreateAccount(View v){
         Intent i= new Intent(this, ProfileActivity.class);
         startActivity(i);

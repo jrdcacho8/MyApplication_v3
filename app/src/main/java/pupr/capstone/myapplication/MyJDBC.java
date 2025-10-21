@@ -24,7 +24,7 @@ public class MyJDBC {
         pass = "Eecf#0819";
 
 */
-        ip = "10.0.0.64";
+        ip = "192.168.0.100";
         port = "3306";
         database = "al_dia_app";
         uname = "root";
