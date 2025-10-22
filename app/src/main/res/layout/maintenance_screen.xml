@@ -50,7 +50,6 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/txtTitle"
-            app:layout_constraintBottom_toTopOf="@+id/txtNote"
             android:layout_marginTop="16dp"
             android:layout_marginStart="32dp"
             android:layout_marginEnd="32dp"
@@ -70,10 +69,9 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/imageMaintenance"
-            app:layout_constraintBottom_toTopOf="@+id/lblLastMaintenance"
-            android:layout_marginTop="24dp"
-            android:layout_marginBottom="24dp"/>
+            android:layout_marginTop="24dp"/>
 
+    <!-- 1. Fecha Reciente (Last Maintenance) -->
     <TextView
             android:id="@+id/lblLastMaintenance"
             android:layout_width="wrap_content"
@@ -84,7 +82,7 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/txtNote"
             app:layout_constraintBaseline_toBaselineOf="@+id/txtLastDateMaintenance"
-            android:layout_marginBottom="8dp"/>
+            android:layout_marginTop="24dp"/>
 
     <EditText
             android:id="@+id/txtLastDateMaintenance"
@@ -101,8 +99,10 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toEndOf="@+id/lblLastMaintenance"
             app:layout_constraintTop_toBottomOf="@+id/txtNote"
-            android:layout_marginTop="8dp" android:focusable="false"/>
+            android:layout_marginTop="16dp"
+            android:focusable="false"/>
 
+    <!-- 2. Próxima Fecha (Next Maintenance) - Correctly constrained below Last Date -->
     <TextView
             android:id="@+id/lblNextMaintenance"
             android:layout_width="wrap_content"
@@ -130,7 +130,74 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toEndOf="@+id/lblNextMaintenance"
             app:layout_constraintTop_toBottomOf="@+id/txtLastDateMaintenance"
-            android:layout_marginTop="8dp" android:focusable="false"/>
+            android:layout_marginTop="8dp"
+            android:focusable="false"/>
+
+    <!-- 3. lblSelectDate / txtSelectDate - CONSTRAINED BELOW Next Maintenance -->
+    <TextView
+            android:id="@+id/lblSelectDate"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="32dp"
+            android:text="Fecha Selección:"
+            android:textSize="16sp"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/lblNextMaintenance"
+            app:layout_constraintBaseline_toBaselineOf="@+id/txtSelectDate"
+            android:layout_marginTop="16dp"
+            android:visibility="gone"/>
+
+    <EditText
+            android:id="@+id/txtSelectDate"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            android:layout_marginEnd="32dp"
+            android:ems="10"
+            android:enabled="true"
+            android:inputType="date"
+            android:textAlignment="center"
+            android:textSize="20sp"
+            android:textStyle="bold"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toEndOf="@+id/lblSelectDate"
+            app:layout_constraintTop_toBottomOf="@+id/txtNextMaintenance"
+            android:layout_marginTop="8dp"
+            android:focusable="false"
+            android:visibility="gone"/>
+
+    <!-- 4. lblDateMaintenance / txtDateMaintenance - CONSTRAINED BELOW Select Date -->
+    <TextView
+            android:id="@+id/lblDateMaintenance"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="32dp"
+            android:text="Otra Fecha Maint.:"
+            android:textSize="16sp"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/lblSelectDate"
+            app:layout_constraintBaseline_toBaselineOf="@+id/txtDateMaintenance"
+            android:layout_marginTop="16dp"
+            android:visibility="gone"/>
+
+    <EditText
+            android:id="@+id/txtDateMaintenance"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            android:layout_marginEnd="32dp"
+            android:ems="10"
+            android:enabled="true"
+            android:inputType="date"
+            android:textAlignment="center"
+            android:textSize="20sp"
+            android:textStyle="bold"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toEndOf="@+id/lblDateMaintenance"
+            app:layout_constraintTop_toBottomOf="@+id/txtSelectDate"
+            android:layout_marginTop="8dp"
+            android:focusable="false"
+            android:visibility="gone"/>
 
     <Button
             android:id="@+id/btnUpdateMaintenance"
@@ -141,7 +208,7 @@
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/txtNextMaintenance"
+            app:layout_constraintTop_toBottomOf="@+id/txtDateMaintenance"
             app:layout_constraintVertical_bias="1.0" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
