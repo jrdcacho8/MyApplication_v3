@@ -56,7 +56,7 @@ public class MaintenanceActivity extends AppCompatActivity {
 
         cargarMantenimientosDesdeBD(marca);
 
-        car= new Vehicle(marca, license_plate,model,car_mileage);
+        car= new Vehicle(marca, model,license_plate,car_mileage);
 
         adapter = new MaintenanceAdapter(listaMaintenances,car, email);
         recyclerView.setAdapter(adapter);
