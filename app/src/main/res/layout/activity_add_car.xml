@@ -114,7 +114,7 @@
                 android:inputType="text"
                 android:layout_marginStart="@dimen/margin_default"
                 android:layout_marginEnd="@dimen/margin_default"
-                android:layout_marginTop="12dp" />
+                android:layout_marginTop="12dp" android:textAllCaps="true"/>
 
         <TextView
                 android:id="@+id/lblMilleage"

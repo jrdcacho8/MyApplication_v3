@@ -113,6 +113,11 @@ public class AddCar extends AppCompatActivity {
                 EditText editTextYear = findViewById(R.id.editTextYear);
                 EditText editTextMilleage = findViewById(R.id.editTextMilleage);
                 EditText editTextLicensePlate = findViewById(R.id.editTextLicensePlate);
+
+                editTextLicensePlate.setFilters(new android.text.InputFilter[]{
+                        new android.text.InputFilter.AllCaps()
+                });
+
                 if (!marcaSeleccionada.equals("Seleccione una marca")) {
                     // Activar modelo
                     spinnerModelo.setEnabled(true);
