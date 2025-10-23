@@ -41,26 +41,8 @@ public final class VehicleReportExporter {
 
     private VehicleReportExporter() {}
 
-    // ================== APIS PÚBLICAS ==================
 
-    /** Exporta desde un objeto Vehicle (si tienes year/image, los usa; si no, omite). */
-    public static Uri export(Context ctx, String userEmail, Vehicle v) throws IOException {
-        String brand = safe(v.getBrand());
-        String model = safe(v.getModel());
-        String plate = safe(v.getLicense_plate());
-        Integer year = null;
-        try {
-            // si tu Vehicle no tiene año, ignora
-            year = v.getYear() <= 0 ? null : v.getYear();
-        } catch (Throwable ignored) {}
 
-        Bitmap image = null;
-        try {
-            image = v.getImageBitmap();
-        } catch (Throwable ignored) {}
-
-        return export(ctx, userEmail, brand, model, year, plate, image);
-    }
 
     /**
      * Exporta leyendo los servicios de la BD por EMAIL + LICENSE_PLATE.
@@ -72,12 +54,15 @@ public final class VehicleReportExporter {
                              String model,
                              Integer year,
                              String plate,
-                             Bitmap image) throws IOException {
+                             Bitmap image,
+                             Date startDate,   // <— NUEVO
+                             Date endDate      // <— NUEVO
+    ) throws IOException {
 
-        // 1) Cargar datos de servicios desde la BD
-        List<ServiceRow> rows = queryServices(userEmail, plate);
+        // 1) Cargar datos de servicios desde la BD (FILTRADO)
+        List<ServiceRow> rows = queryServices(userEmail, plate, startDate, endDate);
 
-        // 2) Construir PDF con formato del ejemplo
+        // 2) Construir PDF
         PdfDocument pdf = buildPdf(userEmail, brand, model, year, plate, image, rows);
         try {
             String fname = "InformeMantenimiento_" + clean(brand) + "_" + clean(model)
@@ -87,6 +72,7 @@ public final class VehicleReportExporter {
             pdf.close();
         }
     }
+
 
     /** Abre el PDF en un visor. */
     public static void openPdf(Context ctx, Uri uri) {
@@ -103,18 +89,33 @@ public final class VehicleReportExporter {
     // ================== BD: CONSULTA SERVICIOS ==================
 
     /** Consulta SERVICIO por EMAIL y LICENSE_PLATE. Ajusta nombres si difieren en tu DB. */
-    private static List<ServiceRow> queryServices(String email, String plate) {
+    private static List<ServiceRow> queryServices(String email, String plate, Date start, Date end) {
         List<ServiceRow> out = new ArrayList<>();
-        String sql = "SELECT DATE_SERVICE, SERVICE_TYPE, COMPANY_SERVICE, COST_SERVICE " +
-                "FROM SERVICE " +
-                "WHERE EMAIL = ? AND LICENSE_PLATE = ? " +
-                "ORDER BY DATE_SERVICE ASC";
+
+        // Si alguna de las fechas es null, no usamos filtro por rango
+        final boolean useRange = (start != null && end != null);
+
+        String base = "SELECT DATE_SERVICE, SERVICE_TYPE, COMPANY_SERVICE, COST_SERVICE " +
+                "FROM SERVICE WHERE EMAIL = ? AND LICENSE_PLATE = ? ";
+        String order = " ORDER BY DATE_SERVICE ASC";
+
+        String sql = useRange
+                ? base + " AND DATE_SERVICE BETWEEN ? AND ? " + order
+                : base + order;
 
         try (Connection c = new MyJDBC().obtenerConexion();
              PreparedStatement ps = c.prepareStatement(sql)) {
 
-            ps.setString(1, email);
-            ps.setString(2, plate);
+            int idx = 1;
+            ps.setString(idx++, email);
+            ps.setString(idx++, plate);
+
+            if (useRange) {
+                // Suponiendo que DATE_SERVICE es tipo DATE (sin hora) en MySQL:
+                // java.sql.Date ignora horas; BETWEEN será inclusivo (yyyy-MM-dd)
+                ps.setDate(idx++, new java.sql.Date(start.getTime()));
+                ps.setDate(idx++, new java.sql.Date(end.getTime()));
+            }
 
             try (ResultSet rs = ps.executeQuery()) {
                 while (rs.next()) {
@@ -123,16 +124,16 @@ public final class VehicleReportExporter {
                     String company = rs.getString("COMPANY_SERVICE");
                     BigDecimal cost = rs.getBigDecimal("COST_SERVICE");
                     out.add(new ServiceRow(d != null ? new Date(d.getTime()) : null,
-                             safe(company),safe(type),
+                            safe(company), safe(type),
                             cost != null ? cost : BigDecimal.ZERO));
                 }
             }
         } catch (Exception e) {
-            // Si algo falla, devolvemos la lista vacía; el PDF mostrará "No hay servicios"
             e.printStackTrace();
         }
         return out;
     }
+
 
     // ================== PDF RENDER ==================
 

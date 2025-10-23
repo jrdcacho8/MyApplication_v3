@@ -33,53 +33,100 @@ public class GarageActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_garage);
 
-        // Obtener el email del usuario autenticado
-
         userEmail = getIntent().getStringExtra("email");
-        //obtener nombre de usuario  para identificar garaje
+        String nameExtra = getIntent().getStringExtra("name"); // puede ser null
 
-        try {
-            setGarageName(userEmail);
-        } catch (SQLException e) {
-            throw new RuntimeException(e);
-        }
+        // 1) Intent → 2) Google account → 3) BD → 4) Desconocido
+        resolveAndSetGarageName(userEmail, nameExtra);
 
-
-        // Change it here
         recyclerView = findViewById(R.id.recyclerViewAutos);
         recyclerView.setLayoutManager(new GridLayoutManager(this, 2));
         autos = new ArrayList<>();
 
-        // Cargar autos desde la base de datos según el email
         cargarAutosDesdeBD(userEmail);
 
-        // Configurar adaptador
         adapter = new AutoAdapter(autos, userEmail);
         recyclerView.setAdapter(adapter);
-
 
         adapter.setOnItemClickListener(new AutoAdapter.OnItemClickListener() {
             @Override
             public void onItemClick(Vehicle autos, String userEmail) {
-
                 Intent intent = new Intent(GarageActivity.this, MaintenanceActivity.class);
                 intent.putExtra("marca", autos.getBrand());
                 intent.putExtra("license_plate", autos.getLicense_plate());
                 intent.putExtra("model", autos.getModel());
                 intent.putExtra("email", userEmail);
                 intent.putExtra("car_mileage", autos.getMileage());
-
-
                 startActivity(intent);
             }
-
-            @Override
-            public void onItemClick(Vehicle auto) {
-
-            }
+            @Override public void onItemClick(Vehicle auto) {}
         });
+
         BottomNavRouter.setup(this, findViewById(R.id.bottomNav), R.id.nav_garaje, userEmail);
     }
+
+    private void resolveAndSetGarageName(String email, String nameExtra) {
+        TextView garage_owner = findViewById(R.id.txtGarageName);
+
+        // 1) Intent (más confiable al venir del mismo login)
+        String name = safeFirstName(nameExtra);
+        if (name != null && !name.isEmpty()) {
+            garage_owner.setText("Garaje de " + name);
+            return;
+        }
+
+        // 2) Última cuenta Google (por si el Intent no trajo name)
+        try {
+            com.google.android.gms.auth.api.signin.GoogleSignInAccount acc =
+                    com.google.android.gms.auth.api.signin.GoogleSignIn.getLastSignedInAccount(this);
+            if (acc != null && acc.getDisplayName() != null) {
+                name = safeFirstName(acc.getDisplayName());
+                if (name != null && !name.isEmpty()) {
+                    garage_owner.setText("Garaje de " + name);
+                    return;
+                }
+            }
+        } catch (Exception ignored) {}
+
+        // 3) BD (fallback final)
+        new Thread(() -> {
+            String dbName = null;
+            try {
+                MyJDBC myJDBC = new MyJDBC();
+                try (Connection connection = myJDBC.obtenerConexion()) {
+                    if (connection != null) {
+                        String query = "SELECT `NAME` FROM `USER` WHERE `EMAIL` = ?";
+                        try (PreparedStatement stmt = connection.prepareStatement(query)) {
+                            stmt.setString(1, email);
+                            try (ResultSet rs = stmt.executeQuery()) {
+                                if (rs.next()) dbName = rs.getString("NAME");
+                            }
+                        }
+                    }
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+
+            final String finalName = safeFirstName(dbName);
+            runOnUiThread(() -> {
+                if (finalName != null && !finalName.isEmpty()) {
+                    garage_owner.setText("Garaje de " + finalName);
+                } else {
+                    garage_owner.setText("Garaje de usuario desconocido");
+                }
+            });
+        }).start();
+    }
+
+    private String safeFirstName(String fullName) {
+        if (fullName == null) return null;
+        fullName = fullName.trim();
+        if (fullName.isEmpty()) return null;
+        int space = fullName.indexOf(" ");
+        return (space > 0) ? fullName.substring(0, space) : fullName;
+    }
+
 
     private void cargarAutosDesdeBD(String email) {
         try {

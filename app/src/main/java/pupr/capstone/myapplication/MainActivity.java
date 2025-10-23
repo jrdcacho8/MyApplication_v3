@@ -200,14 +200,16 @@ public class MainActivity extends AppCompatActivity {
                 GoogleSignInAccount account = task.getResult(ApiException.class);
                 String email = account.getEmail();
                 String name  = account.getDisplayName();
-                // Guarda/actualiza en BD (hazlo en un hilo)
+
+                // Guarda/actualiza en BD (en hilo)
                 saveGoogleUserToDB(email, name);
 
-                Toast.makeText(this, "Bienvenido: " + account.getDisplayName(), Toast.LENGTH_SHORT).show();
+                Toast.makeText(this, "Bienvenido: " + name, Toast.LENGTH_SHORT).show();
 
-                // 🚗 Redirigir a la misma pantalla que login normal
+                // 🚗 Pasa email + name a GarageActivity
                 Intent i = new Intent(this, GarageActivity.class);
                 i.putExtra("email", email);
+                i.putExtra("name",  name);         // <— ¡CLAVE!
                 startActivity(i);
 
             } catch (ApiException e) {
@@ -216,6 +218,7 @@ public class MainActivity extends AppCompatActivity {
             }
         }
     }
+
     private void saveGoogleUserToDB(String email, String name) {
         new Thread(() -> {
             try {
@@ -228,11 +231,13 @@ public class MainActivity extends AppCompatActivity {
                     return;
                 }
 
-                // Ajusta los nombres de columnas/tabla a tu esquema real.
-                // Requiere que EMAIL sea UNIQUE/PRIMARY KEY en USUARIO.
-                String sql = "INSERT INTO USER (EMAIL, NAME, PASSWORD, PROVIDER) " +
-                        "VALUES (?, ?, NULL, 'google') " +
-                        "ON DUPLICATE KEY UPDATE NAME = VALUES(NAME), PROVIDER = 'google'";
+                // Asegúrate en tu BD (una sola vez):
+                // ALTER TABLE `USER` ADD UNIQUE KEY `uk_user_email` (`EMAIL`);
+                //
+                // IMPORTANTE: `USER` es palabra reservada en MySQL. Siempre usa backticks.
+                String sql = "INSERT INTO `USER` (`EMAIL`, `NAME`, `PASSWORD`) " +
+                        "VALUES (?, ?, NULL) " +
+                        "ON DUPLICATE KEY UPDATE `NAME` = VALUES(`NAME`)";
 
                 try (java.sql.PreparedStatement ps = cn.prepareStatement(sql)) {
                     ps.setString(1, email);
@@ -249,5 +254,6 @@ public class MainActivity extends AppCompatActivity {
             }
         }).start();
     }
+
 
 }
