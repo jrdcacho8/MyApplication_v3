@@ -152,10 +152,12 @@
                         android:layout_height="42dp"
                         android:hint="$0.00"
                         android:inputType="numberDecimal"
+                        android:gravity="end"
                         android:padding="8dp"
                         android:textSize="13sp"
                         android:background="@android:drawable/edit_text"
                         android:layout_marginBottom="10dp"/>
+
 
                 <!-- Recibo -->
                 <Button
@@ -167,7 +169,8 @@
                         android:textStyle="bold"
                         android:textSize="13sp"
                         android:backgroundTint="#FF9800"
-                        android:layout_marginBottom="10dp"/>
+                        android:layout_marginBottom="10dp"
+                        android:visibility="invisible"/>
 
                 <!-- Errores -->
                 <TextView

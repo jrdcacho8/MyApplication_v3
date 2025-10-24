@@ -6,173 +6,201 @@
         android:id="@+id/main"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:background="#F5F5F5"
         tools:context=".AddCar">
 
+    <!-- 🔹 Botón flotante para regresar -->
     <com.google.android.material.floatingactionbutton.FloatingActionButton
             android:id="@+id/btnBackMaintenance"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:clickable="true"
-            app:srcCompat="@drawable/back_button"
-            android:contentDescription="'Back'"
-            android:layout_marginTop="16dp"
-            android:layout_marginStart="16dp"
+            app:srcCompat="@drawable/white_arrow_back_24"
+            android:contentDescription="Volver"
+            android:tint="@android:color/white"
+            app:backgroundTint="#2196F3"
+            android:elevation="6dp"
             app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintStart_toStartOf="parent" />
-
-    <Button
+            app:layout_constraintStart_toStartOf="parent"
+            android:layout_marginTop="16dp"
+            android:layout_marginStart="16dp" app:layout_constraintBottom_toTopOf="@+id/guideline"/>
+    <!-- 🔹 Título -->
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
             android:id="@+id/buttonGuardar"
             android:layout_width="wrap_content"
-            android:layout_height="49dp"
-            android:text="Guardar"
-            android:textSize="12sp"
-            android:onClick="guardarVehiculo"
-            android:layout_marginTop="16dp"
-            android:layout_marginEnd="16dp"
-            app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintEnd_toEndOf="parent" />
+            android:layout_height="wrap_content"
+            app:srcCompat="@drawable/ic_add_white_24"
 
+            android:contentDescription="Volver"
+            android:tint="@android:color/white"
+            app:backgroundTint="#2196F3"
+            android:elevation="6dp"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            android:layout_marginTop="16dp"
+            android:layout_marginEnd="20dp"/>
+
+    <!-- 🔹 Botón Guardar buttonGuardar -->
+
+
+    <!-- 🔹 Imagen del auto -->
     <ImageView
             android:id="@+id/imageViewGallery"
-            android:layout_width="100dp"
-            android:layout_height="100dp"
-            android:src="@android:drawable/ic_menu_camera"
+            android:layout_width="140dp"
+            android:layout_height="120dp"
+            android:src="@drawable/default_car_image"
             android:scaleType="centerCrop"
-            android:layout_marginTop="24dp"
-            app:layout_constraintTop_toBottomOf="@id/buttonGuardar"
+            android:background="@drawable/rounded_image_bg"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintEnd_toEndOf="parent" />
+            app:layout_constraintEnd_toEndOf="parent" app:layout_constraintTop_toTopOf="@+id/guideline"
+            android:layout_marginTop="3dp"/>
 
+    <!-- 🔹 Botón para elegir imagen -->
     <Button
             android:id="@+id/btnPickImageGallery"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Agregar Imagen"
-            android:textSize="10sp"
-            android:layout_marginTop="8dp"
+            android:textSize="13sp"
+            android:textStyle="bold"
+            android:textColor="@android:color/white"
+            android:backgroundTint="#2196F3"
+            android:paddingHorizontal="16dp"
+            android:layout_marginTop="10dp"
             app:layout_constraintTop_toBottomOf="@id/imageViewGallery"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent" />
 
+    <!-- 🔹 Formulario -->
+    <ScrollView
+            android:id="@+id/scrollView3"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:layout_margin="16dp"
+            app:layout_constraintTop_toBottomOf="@id/btnPickImageGallery"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent">
+
+        <LinearLayout
+                android:id="@+id/layoutSelections"
+                android:orientation="vertical"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:padding="12dp"
+                android:background="@android:color/white"
+                android:elevation="2dp"
+                android:layout_marginBottom="24dp"
+                android:paddingBottom="32dp">
+
+            <!-- 🔸 Vehículo -->
+            <TextView
+                    android:id="@+id/textView2"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Vehículo Actual"
+                    android:textStyle="bold"
+                    android:textSize="18sp"
+                    android:textColor="#333333"
+                    android:layout_marginTop="8dp"/>
+
+            <Spinner
+                    android:id="@+id/spinnerMarca"
+                    android:layout_width="match_parent"
+                    android:layout_height="45dp"
+                    android:layout_marginTop="8dp"
+                    android:background="@android:drawable/btn_dropdown"/>
+
+            <Spinner
+                    android:id="@+id/spinnerModelo"
+                    android:layout_width="match_parent"
+                    android:layout_height="45dp"
+                    android:layout_marginTop="8dp"
+                    android:background="@android:drawable/btn_dropdown"/>
+
+            <!-- 🔸 Tablilla -->
+            <TextView
+                    android:id="@+id/lblLicensePlate"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Tablilla"
+                    android:textStyle="bold"
+                    android:textSize="16sp"
+                    android:layout_marginTop="20dp"
+                    android:textColor="#333333"/>
+
+            <EditText
+                    android:id="@+id/editTextLicensePlate"
+                    android:layout_width="match_parent"
+                    android:layout_height="48dp"
+                    android:hint="000-000"
+                    android:textSize="14sp"
+                    android:inputType="text"
+                    android:background="@android:drawable/edit_text"
+                    android:textAllCaps="true"
+                    android:layout_marginTop="8dp"/>
+
+            <!-- 🔸 Millaje -->
+            <TextView
+                    android:id="@+id/lblMilleage"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Millaje"
+                    android:textStyle="bold"
+                    android:textSize="16sp"
+                    android:layout_marginTop="20dp"
+                    android:textColor="#333333"/>
+
+            <EditText
+                    android:id="@+id/editTextMilleage"
+                    android:layout_width="match_parent"
+                    android:layout_height="48dp"
+                    android:hint="000000"
+                    android:textSize="14sp"
+                    android:inputType="number"
+                    android:background="@android:drawable/edit_text"
+                    android:layout_marginTop="8dp" android:maxLength="6"/>
+
+
+            <!-- 🔸 Año -->
+            <TextView
+                    android:id="@+id/lblYear"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Año"
+                    android:textStyle="bold"
+                    android:textSize="16sp"
+                    android:layout_marginTop="20dp"
+                    android:textColor="#333333"/>
+
+            <Spinner
+                    android:id="@+id/spinnerYear"
+                    android:layout_width="match_parent"
+                    android:layout_height="45dp"
+                    android:layout_marginTop="8dp"
+                    android:background="@android:drawable/btn_dropdown"/>
+
+            <!-- 🔸 Color -->
+            <TextView
+                    android:id="@+id/lblColor"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Color"
+                    android:textStyle="bold"
+                    android:textSize="16sp"
+                    android:layout_marginTop="20dp"
+                    android:textColor="#333333"/>
+
+            <Spinner
+                    android:id="@+id/spinnerColor"
+                    android:layout_width="match_parent"
+                    android:layout_height="45dp"
+                    android:layout_marginTop="8dp"
+                    android:background="@android:drawable/btn_dropdown"/>
+        </LinearLayout>
+    </ScrollView>
     <androidx.constraintlayout.widget.Guideline
-            android:id="@+id/guideline_top_scroll"
             android:orientation="horizontal"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            app:layout_constraintGuide_begin="230dp" /> <ScrollView
-        android:id="@+id/scrollView3"
-        android:layout_width="0dp"
-        android:layout_height="0dp"
-        app:layout_constraintTop_toBottomOf="@id/guideline_top_scroll"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent">
-    <LinearLayout
-            android:id="@+id/layoutSelections"
-            android:orientation="vertical"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:paddingBottom="32dp"> <TextView
-            android:id="@+id/textView2"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Vehículo Actual"
-            android:textSize="20sp"
-            android:layout_marginTop="32dp"
-            android:layout_marginStart="@dimen/margin_default" />
-
-        <Spinner
-                android:id="@+id/spinnerMarca"
-                android:layout_width="match_parent"
-                android:layout_height="49dp"
-                android:layout_marginTop="8dp"
-                android:layout_marginStart="@dimen/margin_default"
-                android:layout_marginEnd="@dimen/margin_default" />
-        <Spinner
-                android:id="@+id/spinnerModelo"
-                android:layout_width="match_parent"
-                android:layout_height="49dp"
-                android:layout_marginTop="8dp"
-                android:layout_marginStart="@dimen/margin_default"
-                android:layout_marginEnd="@dimen/margin_default" />
-
-        <TextView
-                android:id="@+id/lblLicensePlate"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Tablilla"
-                android:textSize="20sp"
-                android:layout_marginStart="@dimen/margin_default"
-                android:layout_marginTop="20dp" />
-        <EditText
-                android:id="@+id/editTextLicensePlate"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:minHeight="48dp"
-                android:hint="000-000"
-                android:textSize="16sp"
-                android:inputType="text"
-                android:layout_marginStart="@dimen/margin_default"
-                android:layout_marginEnd="@dimen/margin_default"
-                android:layout_marginTop="12dp" />
-
-        <TextView
-                android:id="@+id/lblMilleage"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Millaje"
-                android:textSize="20sp"
-                android:layout_marginTop="20dp"
-                android:layout_marginStart="@dimen/margin_default" />
-        <EditText
-                android:id="@+id/editTextMilleage"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:minHeight="48dp"
-                android:hint="000000"
-                android:textSize="16sp"
-                android:inputType="number"
-                android:layout_marginTop="12dp"
-                android:layout_marginStart="@dimen/margin_default"
-                android:layout_marginEnd="@dimen/margin_default" />
-
-        <TextView
-                android:id="@+id/lblYear"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Año"
-                android:textSize="20sp"
-                android:layout_marginStart="@dimen/margin_default"
-                android:layout_marginTop="20dp" />
-        <EditText
-                android:id="@+id/editTextYear"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:minHeight="48dp"
-                android:hint="0000"
-                android:textSize="16sp"
-                android:inputType="number"
-                android:layout_marginStart="@dimen/margin_default"
-                android:layout_marginEnd="@dimen/margin_default"
-                android:layout_marginTop="12dp" />
-
-        <TextView
-                android:id="@+id/lblColor"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Color"
-                android:textSize="20sp"
-                android:layout_marginStart="@dimen/margin_default"
-                android:layout_marginTop="20dp" />
-        <Spinner
-                android:id="@+id/spinnerColor"
-                android:layout_width="match_parent"
-                android:layout_height="45dp"
-                android:layout_marginTop="8dp"
-                android:layout_marginStart="@dimen/margin_default"
-                android:layout_marginEnd="@dimen/margin_default" />
-
-    </LinearLayout>
-</ScrollView>
+            android:layout_height="wrap_content" app:layout_constraintGuide_begin="75dp" android:id="@+id/guideline"/>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

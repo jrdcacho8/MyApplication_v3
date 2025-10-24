@@ -50,10 +50,14 @@ public class UserActivity extends AppCompatActivity {
         BottomNavRouter.setup(this, findViewById(R.id.bottomNav), R.id.nav_perfil, email);
         // Logout: limpia la pila para que no pueda volver con "Back"
         btnSignOut.setOnClickListener(v -> {
+            getSharedPreferences("UserSession", MODE_PRIVATE)
+                    .edit()
+                    .clear()
+                    .apply();
             Intent i = new Intent(this, MainActivity.class);
             i.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
             startActivity(i);
-            finish(); // garantiza cierre de esta Activity
+            finish();
         });
     }
 

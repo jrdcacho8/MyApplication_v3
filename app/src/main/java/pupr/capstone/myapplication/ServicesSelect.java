@@ -99,10 +99,10 @@ public class ServicesSelect extends AppCompatActivity {
             VehicleItem item = vehiculos.get(pos - 1);
             Intent i = new Intent(this, ServicesActivity.class);
             i.putExtra("email", userEmail);
-            // datos útiles para el siguiente paso
             i.putExtra("brand", item.brand);
             i.putExtra("model", item.model);
             i.putExtra("license_plate", item.plate);
+            i.putExtra("vehiculoSeleccionado", item.brand + " " + item.model + " (" + item.plate + ")");
             startActivity(i);
         });
 
@@ -111,29 +111,60 @@ public class ServicesSelect extends AppCompatActivity {
                 Toast.makeText(this, "Selecciona un vehículo primero", Toast.LENGTH_SHORT).show();
                 return;
             }
-            // Usa tus datos actuales del ítem seleccionado (ajústalo a tu estructura)
+
+            // Item seleccionado
             VehicleItem item = vehiculos.get(spinnerVehiculo.getSelectedItemPosition() - 1);
 
-            Integer year = null;
-            try { year = item.year == null || item.year.isEmpty() ? null : Integer.parseInt(item.year); }
-            catch (Exception ignore) {}
+            // Selector de rango (MaterialDatePicker)
+            com.google.android.material.datepicker.MaterialDatePicker.Builder<androidx.core.util.Pair<Long, Long>> builder =
+                    com.google.android.material.datepicker.MaterialDatePicker.Builder.dateRangePicker()
+                            .setTitleText("Selecciona el rango de fechas");
 
-            try {
-                Uri uri = VehicleReportExporter.export(
-                        this,
-                        userEmail,
-                        item.brand,
-                        item.model,
-                        year,
-                        item.plate,
-                        item.image      // Bitmap (puede ser null)
-                );
-                Toast.makeText(this, "PDF guardado en Descargas", Toast.LENGTH_LONG).show();
-                VehicleReportExporter.openPdf(this, uri); // opcional
-            } catch (Exception e) {
-                Toast.makeText(this, "Error al crear PDF: " + e.getMessage(), Toast.LENGTH_LONG).show();
-            }
+            final com.google.android.material.datepicker.MaterialDatePicker<androidx.core.util.Pair<Long, Long>> picker =
+                    builder.build();
+
+            picker.addOnPositiveButtonClickListener(selection -> {
+                if (selection == null || selection.first == null || selection.second == null) {
+                    Toast.makeText(this, "Rango inválido", Toast.LENGTH_SHORT).show();
+                    return;
+                }
+
+                // Normaliza a comienzo/fin del día en la zona del dispositivo
+                java.util.Calendar cal = java.util.Calendar.getInstance();
+                cal.setTimeInMillis(selection.first);
+                setToStartOfDay(cal);
+                java.util.Date startDate = cal.getTime();
+
+                cal.setTimeInMillis(selection.second);
+                setToEndOfDay(cal);
+                java.util.Date endDate = cal.getTime();
+
+                Integer year = null;
+                try { year = item.year == null || item.year.isEmpty() ? null : Integer.parseInt(item.year); }
+                catch (Exception ignore) {}
+
+                try {
+                    android.net.Uri uri = VehicleReportExporter.export(
+                            this,
+                            userEmail,
+                            item.brand,
+                            item.model,
+                            year,
+                            item.plate,
+                            item.image,     // Bitmap (puede ser null)
+                            startDate,
+                            endDate
+                    );
+                    Toast.makeText(this, "PDF guardado en Descargas", Toast.LENGTH_LONG).show();
+                    VehicleReportExporter.openPdf(this, uri);
+                } catch (Exception e) {
+                    Toast.makeText(this, "Error al crear PDF: " + e.getMessage(), Toast.LENGTH_LONG).show();
+                }
+            });
+
+            picker.show(getSupportFragmentManager(), "rangePicker");
         });
+
 
         BottomNavigationView bottomNav = findViewById(R.id.bottomNav);
         BottomNavRouter.setup(
@@ -142,6 +173,19 @@ public class ServicesSelect extends AppCompatActivity {
                 R.id.nav_informe,   // <- id del item que representa ESTA pantalla
                 userEmail           // <- opcional; pásalo si lo usas entre pantallas
         );
+    }
+    private static void setToStartOfDay(java.util.Calendar c) {
+        c.set(java.util.Calendar.HOUR_OF_DAY, 0);
+        c.set(java.util.Calendar.MINUTE, 0);
+        c.set(java.util.Calendar.SECOND, 0);
+        c.set(java.util.Calendar.MILLISECOND, 0);
+    }
+
+    private static void setToEndOfDay(java.util.Calendar c) {
+        c.set(java.util.Calendar.HOUR_OF_DAY, 23);
+        c.set(java.util.Calendar.MINUTE, 59);
+        c.set(java.util.Calendar.SECOND, 59);
+        c.set(java.util.Calendar.MILLISECOND, 999);
     }
 
     private void bindViews() {
@@ -174,7 +218,7 @@ public class ServicesSelect extends AppCompatActivity {
 
                                     Bitmap bmp = null;
                                     byte[] blob = null;
-                                    try { blob = rs.getBytes("IMAGEN"); } catch (Exception ignore) {}
+                                    try { blob = rs.getBytes("IMAGE"); } catch (Exception ignore) {}
                                     if (blob != null && blob.length > 0) {
                                         bmp = BitmapFactory.decodeByteArray(blob, 0, blob.length);
                                     }

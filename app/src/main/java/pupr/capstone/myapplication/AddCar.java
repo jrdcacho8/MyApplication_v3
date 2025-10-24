@@ -3,7 +3,6 @@ package pupr.capstone.myapplication;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
-
 import android.provider.MediaStore;
 import android.view.View;
 import android.widget.*;
@@ -19,6 +18,7 @@ import androidx.core.view.WindowInsetsCompat;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 import java.util.*;
+import java.sql.*;
 
 public class AddCar extends AppCompatActivity {
 
@@ -27,7 +27,7 @@ public class AddCar extends AppCompatActivity {
     ImageView CarImage;
     String userEmail;
     ActivityResultLauncher<Intent> resultLauncher;
-    Spinner spinnerMarca, spinnerModelo, spinnerColor;
+    Spinner spinnerMarca, spinnerModelo, spinnerColor, spinnerYear;
     Map<String, List<String>> modelos = new HashMap<>();
 
     @Override
@@ -42,101 +42,105 @@ public class AddCar extends AppCompatActivity {
             Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
             return insets;
-
-
         });
-        //variables para escoger la foto del vehiculo
+
+        // Variables UI
         btnPickImage = findViewById(R.id.btnPickImageGallery);
         btnBackMaintenance = findViewById(R.id.btnBackMaintenance);
-
         CarImage = findViewById(R.id.imageViewGallery);
         CarImage.setImageResource(R.drawable.default_car_image);
         registerResult();
 
         btnPickImage.setOnClickListener(view -> pickImage());
 
-        //Variable del spinner para escojer la marca del Vehiculo
-        Spinner spinnerMarca = findViewById(R.id.spinnerMarca);
-        Spinner spinnerModelo = findViewById(R.id.spinnerModelo);
-        Spinner spinnerColor= findViewById(R.id.spinnerColor);
+        // Spinners
+        spinnerMarca = findViewById(R.id.spinnerMarca);
+        spinnerModelo = findViewById(R.id.spinnerModelo);
+        spinnerColor = findViewById(R.id.spinnerColor);
+        spinnerYear = findViewById(R.id.spinnerYear);
 
-// Lista de marcas
+        // Listas base
         String[] marcas = {"Seleccione una marca", "Audi", "BMW", "Chrysler", "Dodge", "Ford", "Hyundai", "Infiniti", "Kia",
                 "Lamborghini", "Lexus", "Mazda", "Mercedes-Benz", "Mitsubishi", "Nissan", "Tesla", "Toyota", "Volkswagen", "Volvo"};
-// Lista de color
-        String[] color = {"Seleccione un color", "Amarillo", "Anaranjado", "Azul", "Beige", "Blanco", "Dorado", "Gris", "Marrón", "Negro", "Plata", "Rojo", "Verde", "Violeta","Otro"};
-// Mapa de modelos según la marca
+
+        String[] color = {"Seleccione un color", "Amarillo", "Anaranjado", "Azul", "Beige", "Blanco", "Dorado",
+                "Gris", "Marrón", "Negro", "Plata", "Rojo", "Verde", "Violeta", "Otro"};
+
+        // Modelos por marca
         Map<String, String[]> modelosPorMarca = new HashMap<>();
+        modelosPorMarca.put("Audi", new String[]{"A3 – A8", "Q3 – Q8", "R8", "TT", "Versiones S/RS", "Otro"});
+        modelosPorMarca.put("BMW", new String[]{"M3", "M4", "M5", "M8", "Serie 2 – Serie 8", "X1 – X7", "Z4", "Otro"});
+        modelosPorMarca.put("Chrysler", new String[]{"300", "Pacifica", "Voyager", "Otro"});
+        modelosPorMarca.put("Dodge", new String[]{"Charger", "Challenger", "Durango", "Hornet", "Grand Caravan", "Ram 1500", "Viper", "Journey", "Dart", "Otro"});
+        modelosPorMarca.put("Ford", new String[]{"Bronco", "Bronco Sport", "Edge", "Escape", "Expedition", "Explorer", "F150", "Maverick", "Mustang", "Ranger", "Transit", "Otro"});
+        modelosPorMarca.put("Hyundai", new String[]{"Elantra", "Kona", "Palisade", "Santa Cruz", "Santa Fe", "Sonata", "Tucson", "Venue", "Otro"});
+        modelosPorMarca.put("Infiniti", new String[]{"Q50", "Q60", "QX50", "QX55", "QX60", "QX80", "Otro"});
+        modelosPorMarca.put("Kia", new String[]{"Carnival", "K4", "K5", "Niro", "Seltos", "Sorento", "Soul", "Sportage", "Stinger", "Telluride", "Otro"});
+        modelosPorMarca.put("Lamborghini", new String[]{"Aventador", "Huracán", "Revuelto", "Urus", "Otro"});
+        modelosPorMarca.put("Lexus", new String[]{"ES", "GX", "IS", "LC", "LM", "LS", "LX", "NX", "RX", "TX", "UX", "Otro"});
+        modelosPorMarca.put("Mazda", new String[]{"CX30", "CX5", "CX50", "CX70", "CX90", "Mazda3", "MX5 Miata", "Otro"});
+        modelosPorMarca.put("Mercedes-Benz", new String[]{"AMG", "Clase A–Clase S", "CLA", "CLS", "G-Class", "GLA–GLS", "Otro"});
+        modelosPorMarca.put("Mitsubishi", new String[]{"Eclipse Cross", "Mirage", "Outlander", "Outlander Sport", "Otro"});
+        modelosPorMarca.put("Nissan", new String[]{"Altima", "Frontier", "Kicks", "Maxima", "Pathfinder", "Rogue", "Sentra", "Titan", "Versa", "Z", "Otro"});
+        modelosPorMarca.put("Tesla", new String[]{"Cybertruck", "Model 3", "Model S", "Model X", "Model Y", "Roadster", "Otro"});
+        modelosPorMarca.put("Toyota", new String[]{"4Runner", "Camry", "Corolla", "GR Supra", "Highlander", "Tacoma", "Tundra", "RAV4", "Sienna", "Otro"});
+        modelosPorMarca.put("Volkswagen", new String[]{"Arteon", "Atlas", "Golf", "Jetta", "Taos", "Tiguan", "Otro"});
+        modelosPorMarca.put("Volvo", new String[]{"S60", "S90", "V60", "XC60", "XC90", "Otro"});
 
-        modelosPorMarca.put("Acura", new String[]{"ILX", "Integra", "MDX", "NSX", "RDX", "RLX", "TLX","Otro"});
-        modelosPorMarca.put("Audi", new String[]{"A3 – A8", "Q3 – Q8", "R8", "TT", "Versiones S/RS","Otro"});
-        modelosPorMarca.put("BMW", new String[]{"M3", "M4", "M5", "M8", "Serie 2 – Serie 8", "X1 – X7", "Z4","Otro"});
-        modelosPorMarca.put("Chrysler", new String[]{"300", "Pacifica", "Voyager","Otro"});
-        modelosPorMarca.put("Dodge",new String[]{"Charger", "Challenger", "Durango", "Hornet","Grand Caravan", "Ram 1500", "Viper", "Journey","Dart","Otro"});
-        modelosPorMarca.put("Ford", new String[]{"Bronco", "Bronco Sport", "Edge", "Escape", "Expedition", "Explorer", "F150", "Maverick", "Mustang", "Ranger", "Transit","Otro"});
-        modelosPorMarca.put("Honda", new String[]{"Accord", "Civic", "Clarity", "CR-V", "HR-V", "Insight", "Passport", "Pilot", "Ridgeline","Otro"});
-        modelosPorMarca.put("Hyundai", new String[]{"Elantra", "Kona", "Palisade", "Santa Cruz", "Santa Fe", "Sonata", "Tucson", "Venue","Otro"});
-        modelosPorMarca.put("Infiniti", new String[]{"Q50", "Q60", "QX50", "QX55", "QX60", "QX80","Otro"});
-        modelosPorMarca.put("Jeep", new String[]{"Cherokee", "Compass", "Gladiator", "Grand Cherokee", "Grand Cherokee L", "Grand Wagoneer", "Renegade", "Wagoneer", "Wrangler","Otro"});
-        modelosPorMarca.put("Kia", new String[]{"Carnival", "K4", "K5", "Niro", "Seltos", "Sorento", "Soul", "Sportage", "Stinger", "Telluride","Otro"});
-        modelosPorMarca.put("Lamborghini", new String[]{"Aventador", "Huracán", "Huracán Sterrato", "Revuelto", "Urus","Otro"});
-        modelosPorMarca.put("Lexus", new String[]{"ES", "GX", "IS", "LBX", "LC", "LM", "LS", "LX", "NX", "RX", "TX", "UX","Otro"});
-        modelosPorMarca.put("Mazda", new String[]{"CX30", "CX5", "CX50", "CX70", "CX90", "Mazda3", "MX5 Miata","Otro"});
-        modelosPorMarca.put("Mercedes-Benz", new String[]{"AMG", "Clase A–Clase S", "CLA", "CLS", "G-Class", "GLA–GLS","Otro"});
-        modelosPorMarca.put("Mini", new String[]{"Convertible", "Countryman", "John Cooper Works", "Mini Hatch","Otro"});
-        modelosPorMarca.put("Mitsubishi", new String[]{"Eclipse Cross", "Mirage", "Montero", "Outlander", "Outlander Sport","Otro"});
-        modelosPorMarca.put("Nissan", new String[]{"Altima", "Frontier", "Kicks", "Maxima", "Murano", "Pathfinder", "Rogue", "Sentra", "Titan", "Versa", "Z","Otro"});
-        modelosPorMarca.put("Porsche", new String[]{"718 Cayman / Boxster", "911", "Cayenne", "Macan", "Panamera","Otro"});
-        modelosPorMarca.put("RAM", new String[]{"ProMaster", "RAM 1500", "RAM 2500", "RAM 3500","Otro"});
-        modelosPorMarca.put("Tesla", new String[]{"Cybertruck", "Model 3", "Model S", "Model X", "Model Y", "Roadster","Otro"});
-        modelosPorMarca.put("Toyota", new String[]{"4Runner", "C-HR", "Camry", "Corolla", "Crown", "Grand Highlander", "GR Corolla", "GR Supra", "GR86", "Highlander", "Land Cruiser", "Mirai", "Prius", "RAV4", "Sequoia", "Sienna", "Tacoma", "Tundra", "Urban Cruiser","Otro"});
-        modelosPorMarca.put("Volkswagen", new String[]{"Arteon", "Atlas", "Golf", "Jetta", "Taos", "Tiguan","Otro"});
-        modelosPorMarca.put("Volvo", new String[]{"S60", "S90", "V60", "XC60", "XC90","Otro"});
-
-// Adapter de marcas
+        // Adapter de marca
         ArrayAdapter<String> adapterMarca = new ArrayAdapter<>(this, android.R.layout.simple_spinner_item, marcas);
         adapterMarca.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         spinnerMarca.setAdapter(adapterMarca);
-// Adapter de color
+
+        // Adapter de color
         ArrayAdapter<String> adapterColor = new ArrayAdapter<>(this, android.R.layout.simple_spinner_item, color);
         adapterColor.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         spinnerColor.setAdapter(adapterColor);
-// Inicialmente desactivar modelo
+
+        // Spinner de años dinámico
+        List<String> years = new ArrayList<>();
+        int currentYear = Calendar.getInstance().get(Calendar.YEAR);
+        for (int year = currentYear; year >= 1975; year--) {
+            years.add(String.valueOf(year));
+        }
+        ArrayAdapter<String> adapterYear = new ArrayAdapter<>(this, android.R.layout.simple_spinner_item, years);
+        adapterYear.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        spinnerYear.setAdapter(adapterYear);
+
+        // Inicialmente desactivar modelo y color
         spinnerModelo.setEnabled(false);
         spinnerColor.setEnabled(false);
 
-// Listener para marca
+        // Listener para marca
         spinnerMarca.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
                 String marcaSeleccionada = parent.getItemAtPosition(position).toString();
-                EditText editTextYear = findViewById(R.id.editTextYear);
                 EditText editTextMilleage = findViewById(R.id.editTextMilleage);
                 EditText editTextLicensePlate = findViewById(R.id.editTextLicensePlate);
+
+                editTextLicensePlate.setFilters(new android.text.InputFilter[]{
+                        new android.text.InputFilter.AllCaps(),
+                        new android.text.InputFilter.LengthFilter(6)
+                });
+
                 if (!marcaSeleccionada.equals("Seleccione una marca")) {
-                    // Activar modelo
                     spinnerModelo.setEnabled(true);
                     spinnerColor.setEnabled(true);
-                    editTextYear.setEnabled(true);
+                    spinnerYear.setEnabled(true);
                     editTextMilleage.setEnabled(true);
                     editTextLicensePlate.setEnabled(true);
 
-
-                    // Obtener modelos según la marca
                     String[] modelos = modelosPorMarca.get(marcaSeleccionada);
-
-                    // Asignar modelos al Spinner
                     ArrayAdapter<String> adapterModelo = new ArrayAdapter<>(AddCar.this,
                             android.R.layout.simple_spinner_item, modelos);
                     adapterModelo.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
                     spinnerModelo.setAdapter(adapterModelo);
                 } else {
-                    // Vuelve a desactivar si vuelve a seleccionar default
                     spinnerModelo.setEnabled(false);
-                    editTextYear.setEnabled(false);
+                    spinnerYear.setEnabled(false);
                     editTextMilleage.setEnabled(false);
                     editTextLicensePlate.setEnabled(false);
-
                 }
             }
 
@@ -151,52 +155,49 @@ public class AddCar extends AppCompatActivity {
         });
     }
 
-    private void pickImage(){
+    private void pickImage() {
         Intent intent = new Intent(MediaStore.ACTION_PICK_IMAGES);
         resultLauncher.launch(intent);
     }
 
-    private void registerResult(){
+    private void registerResult() {
         resultLauncher = registerForActivityResult(
                 new ActivityResultContracts.StartActivityForResult(),
                 new ActivityResultCallback<ActivityResult>() {
                     @Override
                     public void onActivityResult(ActivityResult result) {
-                        try{
+                        try {
                             Uri imageUri = result.getData().getData();
                             CarImage.setImageURI(imageUri);
-                        }
-                        catch (Exception e){
+                        } catch (Exception e) {
                             Toast.makeText(AddCar.this, "No se ha podido cargar imagen", Toast.LENGTH_SHORT).show();
                         }
                     }
                 }
         );
     }
-    public void guardarVehiculo(View v){
-        EditText editTextYear = findViewById(R.id.editTextYear);
+
+    public void guardarVehiculo(View v) {
         EditText editTextMilleage = findViewById(R.id.editTextMilleage);
         EditText editTextLicensePlate = findViewById(R.id.editTextLicensePlate);
         Spinner spinnerMarca = findViewById(R.id.spinnerMarca);
         Spinner spinnerModelo = findViewById(R.id.spinnerModelo);
         Spinner spinnerColor = findViewById(R.id.spinnerColor);
+        Spinner spinnerYear = findViewById(R.id.spinnerYear);
         ImageView imageView = findViewById(R.id.imageViewGallery);
 
-        String year = editTextYear.getText().toString();
+        String year = spinnerYear.getSelectedItem().toString();
         String milleage = editTextMilleage.getText().toString();
         String licensePlate = editTextLicensePlate.getText().toString();
         String marca = spinnerMarca.getSelectedItem().toString();
         String modelo = spinnerModelo.getSelectedItem().toString();
         String color = spinnerColor.getSelectedItem().toString();
 
-        // Validaciones mínimas
         if (year.isEmpty() || milleage.isEmpty() || licensePlate.isEmpty() ||
                 marca.equals("Seleccione una marca") || modelo.isEmpty()) {
             Toast.makeText(this, "Todos los campos son requeridos.", Toast.LENGTH_SHORT).show();
             return;
         }
-
-        // Convertir la imagen a bytes
 
         imageView.setDrawingCacheEnabled(true);
         imageView.buildDrawingCache();
@@ -205,31 +206,30 @@ public class AddCar extends AppCompatActivity {
         bitmap.compress(android.graphics.Bitmap.CompressFormat.PNG, 100, stream);
         byte[] imagenBytes = stream.toByteArray();
 
-        // Conexión e inserción
         try {
             MyJDBC jdbc = new MyJDBC();
-            java.sql.Connection con = jdbc.obtenerConexion();
+            Connection con = jdbc.obtenerConexion();
 
             if (con != null) {
-                String query = "INSERT INTO VEHICLE (YEAR, MODEL, COLOR, MILEAGE, LICENSE_PLATE, IMAGE, EMAIL, BRAND) VALUES (?,?, ?, ?, ?, ?, ?, ?)";
-                java.sql.PreparedStatement stmt = con.prepareStatement(query);
+                String query = "INSERT INTO VEHICLE (YEAR, MODEL, COLOR, MILEAGE, LICENSE_PLATE, IMAGE, EMAIL, BRAND) VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
+                PreparedStatement stmt = con.prepareStatement(query);
                 stmt.setInt(1, Integer.parseInt(year));
                 stmt.setString(2, modelo);
                 stmt.setString(3, color);
                 stmt.setInt(4, Integer.parseInt(milleage));
                 stmt.setString(5, licensePlate);
                 stmt.setBytes(6, imagenBytes);
-                stmt.setString(7, userEmail);  // Pasado por Intent
+                stmt.setString(7, userEmail);
                 stmt.setString(8, marca);
 
                 int rows = stmt.executeUpdate();
 
                 if (rows > 0) {
                     Toast.makeText(this, "Vehículo guardado exitosamente", Toast.LENGTH_SHORT).show();
-                    finish(); // O redirigir a otra actividad
                     Intent i = new Intent(this, GarageActivity.class);
                     i.putExtra("email", userEmail);
                     startActivity(i);
+                    finish();
                 } else {
                     Toast.makeText(this, "Error al guardar", Toast.LENGTH_SHORT).show();
                 }
@@ -243,17 +243,4 @@ public class AddCar extends AppCompatActivity {
             Toast.makeText(this, "Error: " + e.getMessage(), Toast.LENGTH_LONG).show();
         }
     }
-
-    public void goBack(View v){
-        finish();
-        overridePendingTransition(R.anim.slide_in_left, R.anim.slide_out_right);
-        //Intent i = new Intent(this, GarageActivity.class);
-        //i.putExtra("email", userEmail);
-        //startActivity(i);
-    }
-
-
-
-
-
 }
