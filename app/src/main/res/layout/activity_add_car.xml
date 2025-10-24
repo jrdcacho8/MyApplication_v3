@@ -14,7 +14,7 @@
             android:id="@+id/btnBackMaintenance"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            app:srcCompat="@drawable/ic_arrow_back_24"
+            app:srcCompat="@drawable/white_arrow_back_24"
             android:contentDescription="Volver"
             android:tint="@android:color/white"
             app:backgroundTint="#2196F3"
@@ -22,39 +22,25 @@
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             android:layout_marginTop="16dp"
-            android:layout_marginStart="16dp" />
-
+            android:layout_marginStart="16dp" app:layout_constraintBottom_toTopOf="@+id/guideline"/>
     <!-- 🔹 Título -->
-    <TextView
-            android:id="@+id/titleAddCar"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Agregar Vehículo"
-            android:textSize="22sp"
-            android:textStyle="bold"
-            android:textColor="#1976D2"
-            app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintStart_toEndOf="@id/btnBackMaintenance"
-            android:layout_marginStart="12dp"
-            android:layout_marginTop="20dp" />
-
-    <!-- 🔹 Botón Guardar -->
-    <Button
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
             android:id="@+id/buttonGuardar"
             android:layout_width="wrap_content"
-            android:layout_height="45dp"
-            android:text="Guardar"
-            android:textSize="14sp"
-            android:textStyle="bold"
-            android:textColor="@android:color/white"
-            android:onClick="guardarVehiculo"
-            android:backgroundTint="#4CAF50"
-            app:cornerRadius="12dp"
-            android:paddingHorizontal="20dp"
+            android:layout_height="wrap_content"
+            app:srcCompat="@drawable/ic_add_white_24"
+
+            android:contentDescription="Volver"
+            android:tint="@android:color/white"
+            app:backgroundTint="#2196F3"
+            android:elevation="6dp"
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             android:layout_marginTop="16dp"
-            android:layout_marginEnd="20dp" />
+            android:layout_marginEnd="20dp"/>
+
+    <!-- 🔹 Botón Guardar buttonGuardar -->
+
 
     <!-- 🔹 Imagen del auto -->
     <ImageView
@@ -64,10 +50,9 @@
             android:src="@drawable/default_car_image"
             android:scaleType="centerCrop"
             android:background="@drawable/rounded_image_bg"
-            android:layout_marginTop="24dp"
-            app:layout_constraintTop_toBottomOf="@id/titleAddCar"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintEnd_toEndOf="parent" />
+            app:layout_constraintEnd_toEndOf="parent" app:layout_constraintTop_toTopOf="@+id/guideline"
+            android:layout_marginTop="3dp"/>
 
     <!-- 🔹 Botón para elegir imagen -->
     <Button
@@ -116,21 +101,21 @@
                     android:textStyle="bold"
                     android:textSize="18sp"
                     android:textColor="#333333"
-                    android:layout_marginTop="8dp" />
+                    android:layout_marginTop="8dp"/>
 
             <Spinner
                     android:id="@+id/spinnerMarca"
                     android:layout_width="match_parent"
                     android:layout_height="45dp"
                     android:layout_marginTop="8dp"
-                    android:background="@android:drawable/btn_dropdown" />
+                    android:background="@android:drawable/btn_dropdown"/>
 
             <Spinner
                     android:id="@+id/spinnerModelo"
                     android:layout_width="match_parent"
                     android:layout_height="45dp"
                     android:layout_marginTop="8dp"
-                    android:background="@android:drawable/btn_dropdown" />
+                    android:background="@android:drawable/btn_dropdown"/>
 
             <!-- 🔸 Tablilla -->
             <TextView
@@ -141,7 +126,7 @@
                     android:textStyle="bold"
                     android:textSize="16sp"
                     android:layout_marginTop="20dp"
-                    android:textColor="#333333" />
+                    android:textColor="#333333"/>
 
             <EditText
                     android:id="@+id/editTextLicensePlate"
@@ -152,7 +137,7 @@
                     android:inputType="text"
                     android:background="@android:drawable/edit_text"
                     android:textAllCaps="true"
-                    android:layout_marginTop="8dp" />
+                    android:layout_marginTop="8dp"/>
 
             <!-- 🔸 Millaje -->
             <TextView
@@ -163,7 +148,7 @@
                     android:textStyle="bold"
                     android:textSize="16sp"
                     android:layout_marginTop="20dp"
-                    android:textColor="#333333" />
+                    android:textColor="#333333"/>
 
             <EditText
                     android:id="@+id/editTextMilleage"
@@ -173,7 +158,8 @@
                     android:textSize="14sp"
                     android:inputType="number"
                     android:background="@android:drawable/edit_text"
-                    android:layout_marginTop="8dp" />
+                    android:layout_marginTop="8dp" android:maxLength="6"/>
+
 
             <!-- 🔸 Año -->
             <TextView
@@ -184,17 +170,14 @@
                     android:textStyle="bold"
                     android:textSize="16sp"
                     android:layout_marginTop="20dp"
-                    android:textColor="#333333" />
+                    android:textColor="#333333"/>
 
-            <EditText
-                    android:id="@+id/editTextYear"
+            <Spinner
+                    android:id="@+id/spinnerYear"
                     android:layout_width="match_parent"
-                    android:layout_height="48dp"
-                    android:hint="2025"
-                    android:textSize="14sp"
-                    android:inputType="number"
-                    android:background="@android:drawable/edit_text"
-                    android:layout_marginTop="8dp" />
+                    android:layout_height="45dp"
+                    android:layout_marginTop="8dp"
+                    android:background="@android:drawable/btn_dropdown"/>
 
             <!-- 🔸 Color -->
             <TextView
@@ -205,15 +188,19 @@
                     android:textStyle="bold"
                     android:textSize="16sp"
                     android:layout_marginTop="20dp"
-                    android:textColor="#333333" />
+                    android:textColor="#333333"/>
 
             <Spinner
                     android:id="@+id/spinnerColor"
                     android:layout_width="match_parent"
                     android:layout_height="45dp"
                     android:layout_marginTop="8dp"
-                    android:background="@android:drawable/btn_dropdown" />
+                    android:background="@android:drawable/btn_dropdown"/>
         </LinearLayout>
     </ScrollView>
+    <androidx.constraintlayout.widget.Guideline
+            android:orientation="horizontal"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" app:layout_constraintGuide_begin="75dp" android:id="@+id/guideline"/>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

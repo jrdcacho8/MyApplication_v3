@@ -169,7 +169,8 @@
                         android:textStyle="bold"
                         android:textSize="13sp"
                         android:backgroundTint="#FF9800"
-                        android:layout_marginBottom="10dp"/>
+                        android:layout_marginBottom="10dp"
+                        android:visibility="invisible"/>
 
                 <!-- Errores -->
                 <TextView
