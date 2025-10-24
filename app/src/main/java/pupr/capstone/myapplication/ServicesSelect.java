@@ -99,10 +99,10 @@ public class ServicesSelect extends AppCompatActivity {
             VehicleItem item = vehiculos.get(pos - 1);
             Intent i = new Intent(this, ServicesActivity.class);
             i.putExtra("email", userEmail);
-            // datos útiles para el siguiente paso
             i.putExtra("brand", item.brand);
             i.putExtra("model", item.model);
             i.putExtra("license_plate", item.plate);
+            i.putExtra("vehiculoSeleccionado", item.brand + " " + item.model + " (" + item.plate + ")");
             startActivity(i);
         });
 
@@ -218,7 +218,7 @@ public class ServicesSelect extends AppCompatActivity {
 
                                     Bitmap bmp = null;
                                     byte[] blob = null;
-                                    try { blob = rs.getBytes("IMAGEN"); } catch (Exception ignore) {}
+                                    try { blob = rs.getBytes("IMAGE"); } catch (Exception ignore) {}
                                     if (blob != null && blob.length > 0) {
                                         bmp = BitmapFactory.decodeByteArray(blob, 0, blob.length);
                                     }

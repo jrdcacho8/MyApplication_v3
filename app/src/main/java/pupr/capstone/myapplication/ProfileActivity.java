@@ -51,40 +51,74 @@ public class ProfileActivity extends AppCompatActivity {
                 return;
             }
 
-            try {
-                MyJDBC myJDBC = new MyJDBC();
-                Connection connection = myJDBC.obtenerConexion();
+            new Thread(() -> {  // 🔄 Mover a hilo secundario para no bloquear la interfaz
+                try {
+                    MyJDBC myJDBC = new MyJDBC();
+                    Connection connection = myJDBC.obtenerConexion();
 
-                if (connection != null) {
-                    String query = "INSERT INTO USER (NAME, EMAIL, PASSWORD) VALUES (?, ?, ?)";
-                    PreparedStatement stmt = connection.prepareStatement(query);
-                    stmt.setString(1, name);
-                    stmt.setString(2, email);
-                    stmt.setString(3, password);
+                    if (connection != null) {
 
-                    int rowsInserted = stmt.executeUpdate();
+                        // ✅ 1. Verificar si el email ya existe
+                        String checkQuery = "SELECT 1 FROM `USER` WHERE `EMAIL` = ?";
+                        PreparedStatement checkStmt = connection.prepareStatement(checkQuery);
+                        checkStmt.setString(1, email);
+                        java.sql.ResultSet rs = checkStmt.executeQuery();
 
-                    stmt.close();
-                    connection.close();
+                        if (rs.next()) {
+                            // Ya existe el email
+                            runOnUiThread(() ->
+                                    Toast.makeText(this, "Ya existe una cuenta registrada con ese correo electrónico", Toast.LENGTH_LONG).show()
+                            );
+                            rs.close();
+                            checkStmt.close();
+                            connection.close();
+                            return;
+                        }
 
-                    if (rowsInserted > 0) {
-                        Toast.makeText(this, "Cuenta creada con éxito", Toast.LENGTH_SHORT).show();
-                        Intent i = new Intent(this, GarageActivity.class);
-                        i.putExtra("email", email);
-                        startActivity(i);
-                        finish();
+                        rs.close();
+                        checkStmt.close();
+
+                        // ✅ 2. Insertar nuevo usuario si no existe
+                        String insertQuery = "INSERT INTO `USER` (`NAME`, `EMAIL`, `PASSWORD`) VALUES (?, ?, ?)";
+                        PreparedStatement stmt = connection.prepareStatement(insertQuery);
+                        stmt.setString(1, name);
+                        stmt.setString(2, email);
+                        stmt.setString(3, password);
+
+                        int rowsInserted = stmt.executeUpdate();
+
+                        stmt.close();
+                        connection.close();
+
+                        if (rowsInserted > 0) {
+                            runOnUiThread(() -> {
+                                Toast.makeText(this, "Cuenta creada con éxito", Toast.LENGTH_SHORT).show();
+                                Intent i = new Intent(this, GarageActivity.class);
+                                i.putExtra("email", email);
+                                i.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                                startActivity(i);
+                                finish();
+                            });
+                        } else {
+                            runOnUiThread(() ->
+                                    Toast.makeText(this, "Error al crear la cuenta", Toast.LENGTH_SHORT).show()
+                            );
+                        }
+
                     } else {
-                        Toast.makeText(this, "Error al crear la cuenta", Toast.LENGTH_SHORT).show();
+                        runOnUiThread(() ->
+                                Toast.makeText(this, "Error de conexión a la base de datos", Toast.LENGTH_SHORT).show()
+                        );
                     }
 
-                } else {
-                    Toast.makeText(this, "Error de conexión a la base de datos", Toast.LENGTH_SHORT).show();
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    runOnUiThread(() ->
+                            Toast.makeText(this, "Error: " + e.getMessage(), Toast.LENGTH_LONG).show()
+                    );
                 }
-
-            } catch (Exception e) {
-                e.printStackTrace();
-                Toast.makeText(this, "Error: " + e.getMessage(), Toast.LENGTH_LONG).show();
-            }
+            }).start();
         });
+
     }
 }

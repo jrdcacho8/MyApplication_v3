@@ -101,6 +101,8 @@ public class ServicesActivity extends AppCompatActivity {
     }
 
     private void setupSpinnerVehiculos() {
+        String vehiculoSeleccionadoIntent = getIntent().getStringExtra("vehiculoSeleccionado"); // 🚗 viene del Intent
+
         List<String> vehiculosCargando = new ArrayList<>();
         vehiculosCargando.add("Cargando vehículos...");
 
@@ -140,25 +142,34 @@ public class ServicesActivity extends AppCompatActivity {
             }
 
             runOnUiThread(() -> {
-                if (vehiculosDelUsuario.size() == 1) {
-                    vehiculosDelUsuario.clear();
-                    vehiculosDelUsuario.add("No hay vehículos registrados");
-                    Toast.makeText(this, "Registra un vehículo primero en Garage", Toast.LENGTH_LONG).show();
-                    spinnerVehiculo.setEnabled(false);
-                    btnGuardar.setEnabled(false);
-                } else {
-                    spinnerVehiculo.setEnabled(true);
-                    btnGuardar.setEnabled(true);
-                }
-
                 ArrayAdapter<String> adapter = new ArrayAdapter<>(
                         this, android.R.layout.simple_spinner_item, vehiculosDelUsuario);
                 adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
                 spinnerVehiculo.setAdapter(adapter);
+
+                if (vehiculosDelUsuario.size() > 1) {
+                    spinnerVehiculo.setEnabled(true);
+                }
+
                 configurarListenerVehiculo();
+
+                // 🔥 Seleccionar automáticamente el vehículo recibido
+                if (vehiculoSeleccionadoIntent != null && !vehiculoSeleccionadoIntent.isEmpty()) {
+                    int index = -1;
+                    for (int i = 0; i < vehiculosDelUsuario.size(); i++) {
+                        if (vehiculosDelUsuario.get(i).equalsIgnoreCase(vehiculoSeleccionadoIntent)) {
+                            index = i;
+                            break;
+                        }
+                    }
+                    if (index > 0) {
+                        spinnerVehiculo.setSelection(index);
+                    }
+                }
             });
         }).start();
     }
+
 
     private void configurarListenerVehiculo() {
         spinnerVehiculo.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
@@ -229,14 +240,11 @@ public class ServicesActivity extends AppCompatActivity {
     }
     private void setupListeners() {
         btnFecha.setOnClickListener(v -> mostrarDatePicker());
-
-        // NUEVO: abrir selector del sistema para elegir una imagen
         btnRecibo.setOnClickListener(v -> pickImageLauncher.launch("image/*"));
-
         btnGuardar.setOnClickListener(v -> guardarServicio());
         btnLimpiar.setOnClickListener(v -> limpiarFormulario());
 
-        // ✅ Actualizar validación en vivo
+
         etCompania.addTextChangedListener(new SimpleTextWatcher() {
             @Override public void afterTextChanged(Editable s) {
                 formulario.setCompania(s.toString().trim());
@@ -244,12 +252,46 @@ public class ServicesActivity extends AppCompatActivity {
             }
         });
 
-        etCosto.addTextChangedListener(new SimpleTextWatcher() {
-            @Override public void afterTextChanged(Editable s) {
-                formulario.setCosto(s.toString());
-                mostrarErrores();
+        etCosto.addTextChangedListener(new android.text.TextWatcher() {
+            private String current = "";
+
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {}
+
+            @Override
+            public void afterTextChanged(Editable s) {
+                if (!s.toString().equals(current)) {
+                    etCosto.removeTextChangedListener(this);
+
+                    String cleanString = s.toString().replaceAll("[^\\d]", "");
+                    if (cleanString.isEmpty()) cleanString = "0";
+
+                    try {
+                        double parsed = Double.parseDouble(cleanString) / 100.0;
+
+                        String formatted = String.format(Locale.US, "%.2f", parsed);
+
+                        current = formatted;
+                        etCosto.setText(formatted);
+                        etCosto.setSelection(formatted.length());
+
+
+                        formulario.setCosto(formatted);
+                        mostrarErrores();
+
+                    } catch (NumberFormatException e) {
+                        etCosto.setText("0.00");
+                        etCosto.setSelection(etCosto.getText().length());
+                    }
+
+                    etCosto.addTextChangedListener(this);
+                }
             }
         });
+
     }
 
     private void guardarServicio() {
@@ -329,6 +371,7 @@ public class ServicesActivity extends AppCompatActivity {
 
             final String finalResultado = resultado;
             runOnUiThread(() -> Toast.makeText(this, finalResultado, Toast.LENGTH_LONG).show());
+            finish();
         }).start();
     }
 

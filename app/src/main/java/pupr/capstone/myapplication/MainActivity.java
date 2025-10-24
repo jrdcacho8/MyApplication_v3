@@ -15,105 +15,79 @@ import android.widget.Toast;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
+
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
 import com.google.android.gms.common.api.ApiException;
 import com.google.android.gms.tasks.Task;
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInClient;
-
-/*
-import androidx.annotation.NonNull;
-import androidx.appcompat.app.AppCompatActivity;
-
-import com.google.android.gms.auth.api.signin.GoogleSignIn;
-import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
-import com.google.android.gms.auth.api.signin.GoogleSignInClient;
-import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
-import com.google.android.gms.common.api.ApiException;
-import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.Task;
-import com.google.firebase.auth.AuthCredential;
-import com.google.firebase.auth.AuthResult;
-import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.auth.FirebaseUser;
-import com.google.firebase.auth.GoogleAuthProvider;
-*/
-/**
- * MainActivity - Pantalla de autenticación de la aplicación
- *
- * Activity principal que maneja la autenticación de usuarios mediante Google Sign-In
- * y Firebase Authentication. Proporciona:
- * - Login con cuenta de Google
- * - Validación de sesión existente
- * - Redirección automática si el usuario ya está autenticado
- *
- * Esta Activity sirve como punto de entrada de la aplicación y valida
- * que el usuario esté autenticado antes de permitir acceso a otras pantallas.
-
- */
-
 
 import java.sql.Connection;
-
-
-
 
 public class MainActivity extends AppCompatActivity {
 
     Connection connect;
-    String ConnectionResult="";
-
+    String ConnectionResult = "";
     ProgressBar progressBar;
 
     // 🌐 Google Sign In
     private static final int RC_SIGN_IN = 9001;
     private GoogleSignInClient mGoogleSignInClient;
 
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        // 🔍 Verificar si ya hay sesión guardada
+        String savedEmail = getSharedPreferences("UserSession", MODE_PRIVATE)
+                .getString("email", null);
+
+        if (savedEmail != null) {
+            // ✅ Ya hay usuario autenticado → saltar login
+            Intent i = new Intent(this, GarageActivity.class);
+            i.putExtra("email", savedEmail);
+            i.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+            startActivity(i);
+            finish();
+            return;
+        }
+
         setContentView(R.layout.activity_main);
-        // Configurar Google Sign In
+
+        // ✅ Configurar Google Sign In
         GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
                 .requestEmail()
                 .build();
         mGoogleSignInClient = GoogleSignIn.getClient(this, gso);
 
-        // Botón login normal
+        // Botones
         Button accessButton = findViewById(R.id.accessButton);
-        accessButton.setOnClickListener(v -> handleAccess(v));
-
-        // Botón crear cuenta
         Button createButton = findViewById(R.id.createButton);
-        createButton.setOnClickListener(v -> handleCreateAccount(v));
-
-        // Botón Google
         Button googleButton = findViewById(R.id.google_signIn);
-        googleButton.setOnClickListener(v -> signIn());
-
         progressBar = findViewById(R.id.progressBar);
+
+        accessButton.setOnClickListener(this::handleAccess);
+        createButton.setOnClickListener(v -> startActivity(new Intent(this, ProfileActivity.class)));
+        googleButton.setOnClickListener(v -> signIn());
     }
 
-    public void handleAccess(View v){
+    // 🚪 LOGIN NORMAL
+    public void handleAccess(View v) {
         EditText emailInput = findViewById(R.id.editTextEmailAddress);
-        EditText passInput  = findViewById(R.id.editTextPassword);
+        EditText passInput = findViewById(R.id.editTextPassword);
 
         String userEmail = emailInput.getText().toString().trim();
-        String userPass  = passInput.getText().toString().trim();
+        String userPass = passInput.getText().toString().trim();
 
-        // 1) Validación ANTES de mostrar el loader
         if (userEmail.isEmpty() || userPass.isEmpty()) {
             Toast.makeText(this, "Completa todos los campos", Toast.LENGTH_SHORT).show();
             return;
         }
 
-        // 2) UI: mostrar loader y bloquear botón
         progressBar.setVisibility(View.VISIBLE);
         v.setEnabled(false);
 
-        // 3) Ejecutar la consulta en un hilo secundario
         new Thread(() -> {
             boolean ok = false;
             String errorMsg = null;
@@ -122,7 +96,7 @@ public class MainActivity extends AppCompatActivity {
                 Connection connection = myJDBC.obtenerConexion();
 
                 if (connection != null) {
-                    String query = "SELECT 1 FROM `USER` WHERE `EMAIL` = ? AND `PASSWORD` = ?"; // usa backticks
+                    String query = "SELECT 1 FROM `USER` WHERE `EMAIL` = ? AND `PASSWORD` = ?";
                     try (java.sql.PreparedStatement statement = connection.prepareStatement(query)) {
                         statement.setString(1, userEmail);
                         statement.setString(2, userPass);
@@ -137,58 +111,45 @@ public class MainActivity extends AppCompatActivity {
             } catch (Exception e) {
                 e.printStackTrace();
                 errorMsg = "Error: " + e.getMessage();
-            } finally {
-                boolean finalOk = ok;
-                String finalError = errorMsg;
-
-                // 4) Volver a UI SIEMPRE para ocultar loader y seguir
-                runOnUiThread(() -> {
-                    progressBar.setVisibility(View.GONE);
-                    v.setEnabled(true);
-
-                    if (finalError != null) {
-                        Toast.makeText(this, finalError, Toast.LENGTH_LONG).show();
-                        return;
-                    }
-
-                    if (finalOk) {
-                        Toast.makeText(this, "Acceso concedido", Toast.LENGTH_SHORT).show();
-                        Intent i = new Intent(this, GarageActivity.class);
-                        i.putExtra("email", userEmail);
-                        startActivity(i);
-                    } else {
-                        Toast.makeText(this, "Correo o contraseña incorrectos", Toast.LENGTH_SHORT).show();
-                    }
-                });
             }
+
+            boolean finalOk = ok;
+            String finalError = errorMsg;
+
+            runOnUiThread(() -> {
+                progressBar.setVisibility(View.GONE);
+                v.setEnabled(true);
+
+                if (finalError != null) {
+                    Toast.makeText(this, finalError, Toast.LENGTH_LONG).show();
+                    return;
+                }
+
+                if (finalOk) {
+                    // Guardar sesión local
+                    getSharedPreferences("UserSession", MODE_PRIVATE)
+                            .edit()
+                            .putString("email", userEmail)
+                            .apply();
+                    Toast.makeText(this, "Acceso concedido", Toast.LENGTH_SHORT).show();
+                    Intent i = new Intent(this, GarageActivity.class);
+                    i.putExtra("email", userEmail);
+                    i.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK); // 🚫 Evita volver atrás
+                    startActivity(i);
+                    finish();
+                } else {
+                    Toast.makeText(this, "Correo o contraseña incorrectos", Toast.LENGTH_SHORT).show();
+                }
+            });
         }).start();
     }
 
-    public void handleCreateAccount(View v){
-        Intent i= new Intent(this, ProfileActivity.class);
-        startActivity(i);
-    }
-
-
-    // 🌐 Google Sign In
+    // 🌐 LOGIN CON GOOGLE
     private void signIn() {
-        //Forzar logout antes de iniciar sesión
         mGoogleSignInClient.signOut().addOnCompleteListener(this, task -> {
             Intent signInIntent = mGoogleSignInClient.getSignInIntent();
             startActivityForResult(signInIntent, RC_SIGN_IN);
         });
-    }
-    private void requestNotificationPermission() {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) { // Android 13+
-            if (ContextCompat.checkSelfPermission(this, Manifest.permission.POST_NOTIFICATIONS)
-                    != PackageManager.PERMISSION_GRANTED) {
-                ActivityCompat.requestPermissions(
-                        this,
-                        new String[]{Manifest.permission.POST_NOTIFICATIONS},
-                        101
-                );
-            }
-        }
     }
 
     @Override
@@ -199,31 +160,36 @@ public class MainActivity extends AppCompatActivity {
             try {
                 GoogleSignInAccount account = task.getResult(ApiException.class);
                 String email = account.getEmail();
-                String name  = account.getDisplayName();
+                String name = account.getDisplayName();
 
-                // Guarda/actualiza en BD (en hilo)
                 saveGoogleUserToDB(email, name);
-
+                // Guardar sesión local
+                getSharedPreferences("UserSession", MODE_PRIVATE)
+                        .edit()
+                        .putString("email", email)
+                        .apply();
                 Toast.makeText(this, "Bienvenido: " + name, Toast.LENGTH_SHORT).show();
 
-                // 🚗 Pasa email + name a GarageActivity
                 Intent i = new Intent(this, GarageActivity.class);
                 i.putExtra("email", email);
-                i.putExtra("name",  name);         // <— ¡CLAVE!
+                i.putExtra("name", name);
+                i.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK); // 🚫 Evita volver atrás
                 startActivity(i);
+                finish();
 
             } catch (ApiException e) {
                 Log.w("GoogleSignIn", "Error en login: " + e.getStatusCode());
-                Toast.makeText(this, "Fallo login con Google", Toast.LENGTH_SHORT).show();
+                Toast.makeText(this, "Error al iniciar sesión con Google", Toast.LENGTH_SHORT).show();
             }
         }
     }
 
+    // 💾 Guarda usuario Google en BD con contraseña aleatoria
     private void saveGoogleUserToDB(String email, String name) {
         new Thread(() -> {
             try {
                 MyJDBC myJDBC = new MyJDBC();
-                java.sql.Connection cn = myJDBC.obtenerConexion();
+                Connection cn = myJDBC.obtenerConexion();
                 if (cn == null) {
                     runOnUiThread(() ->
                             Toast.makeText(this, "No se pudo conectar a la BD", Toast.LENGTH_SHORT).show()
@@ -231,21 +197,20 @@ public class MainActivity extends AppCompatActivity {
                     return;
                 }
 
-                // Asegúrate en tu BD (una sola vez):
-                // ALTER TABLE `USER` ADD UNIQUE KEY `uk_user_email` (`EMAIL`);
-                //
-                // IMPORTANTE: `USER` es palabra reservada en MySQL. Siempre usa backticks.
+                String randomPassword = generateRandomPassword(12);
                 String sql = "INSERT INTO `USER` (`EMAIL`, `NAME`, `PASSWORD`) " +
-                        "VALUES (?, ?, NULL) " +
+                        "VALUES (?, ?, ?) " +
                         "ON DUPLICATE KEY UPDATE `NAME` = VALUES(`NAME`)";
 
                 try (java.sql.PreparedStatement ps = cn.prepareStatement(sql)) {
                     ps.setString(1, email);
                     ps.setString(2, name != null ? name : "");
+                    ps.setString(3, randomPassword);
                     ps.executeUpdate();
                 }
 
                 cn.close();
+
             } catch (Exception e) {
                 e.printStackTrace();
                 runOnUiThread(() ->
@@ -255,5 +220,16 @@ public class MainActivity extends AppCompatActivity {
         }).start();
     }
 
+    // 🔑 Generador de contraseña aleatoria
+    private String generateRandomPassword(int length) {
+        String chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789@#&$!";
+        StringBuilder password = new StringBuilder();
+        java.util.Random random = new java.util.Random();
+
+        for (int i = 0; i < length; i++) {
+            password.append(chars.charAt(random.nextInt(chars.length())));
+        }
+        return password.toString();
+    }
 
 }

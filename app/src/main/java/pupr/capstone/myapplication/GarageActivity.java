@@ -68,27 +68,13 @@ public class GarageActivity extends AppCompatActivity {
     private void resolveAndSetGarageName(String email, String nameExtra) {
         TextView garage_owner = findViewById(R.id.txtGarageName);
 
-        // 1) Intent (más confiable al venir del mismo login)
-        String name = safeFirstName(nameExtra);
-        if (name != null && !name.isEmpty()) {
-            garage_owner.setText("Garaje de " + name);
+        // 1️⃣ Nombre pasado desde MainActivity
+        if (nameExtra != null && !nameExtra.isEmpty()) {
+            garage_owner.setText("Garaje de " + safeFirstName(nameExtra));
             return;
         }
 
-        // 2) Última cuenta Google (por si el Intent no trajo name)
-        try {
-            com.google.android.gms.auth.api.signin.GoogleSignInAccount acc =
-                    com.google.android.gms.auth.api.signin.GoogleSignIn.getLastSignedInAccount(this);
-            if (acc != null && acc.getDisplayName() != null) {
-                name = safeFirstName(acc.getDisplayName());
-                if (name != null && !name.isEmpty()) {
-                    garage_owner.setText("Garaje de " + name);
-                    return;
-                }
-            }
-        } catch (Exception ignored) {}
-
-        // 3) BD (fallback final)
+        // 2️⃣ Intentar obtenerlo de la BD
         new Thread(() -> {
             String dbName = null;
             try {
@@ -118,6 +104,7 @@ public class GarageActivity extends AppCompatActivity {
             });
         }).start();
     }
+
 
     private String safeFirstName(String fullName) {
         if (fullName == null) return null;
