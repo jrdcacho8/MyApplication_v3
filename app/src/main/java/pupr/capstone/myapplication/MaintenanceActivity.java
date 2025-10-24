@@ -64,15 +64,6 @@ public class MaintenanceActivity extends AppCompatActivity {
 
         // Manejar el clic de cada item
         adapter.setOnItemClickListener(new MaintenanceAdapter.OnItemClickListener() {
-            @Override
-            public void onItemClick(Maintenance maintenance) {
-
-            }
-
-            @Override
-            public void onItemClick(Maintenance maintenance, String userEmail) {
-
-            }
 
             //MaintenanceAdapter.OnItemClickListener()
              @Override
@@ -180,7 +171,7 @@ public class MaintenanceActivity extends AppCompatActivity {
                         case "Bujías Convencionales":
                             maintenance_picture = 16;
                             break;
-                        case "Bujías de Iridio":
+                        case "Bujías de iridio":
                             maintenance_picture = 17;
                             break;
                         case "Alineación de gomas":

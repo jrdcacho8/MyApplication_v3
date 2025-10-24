@@ -113,7 +113,7 @@ public class MaintenanceTypeDetails extends AppCompatActivity {
                 maintenanceType :
                 carBrand + "\n" + carModel + "\n" + carLicensePlate;
         txtTitle.setText(titleText);
-        txtNote.setText((note != null && !note.isEmpty()) ? note : "—");
+        txtNote.setText((note != null && !note.isEmpty()) ? note : " ");
 
         int resId = mapPictureKeyToDrawable(pictureKey);
         imageMaintenance.setImageResource(resId);
@@ -199,12 +199,12 @@ public class MaintenanceTypeDetails extends AppCompatActivity {
     private void setupMaintenanceDisplay() {
         if (mileageTrigger && timeTrigger) {
             mileageDue = carMileage + mileageRate;
-            displayBoth(mileageDue);
+            displayBoth();
         } else if (timeTrigger) {
             displayTimeOnly();
         } else if (mileageTrigger) {
             mileageDue = carMileage + mileageRate;
-            displayMileageOnly(mileageDue);
+            displayMileageOnly();
         } else {
             displayNone();
         }
@@ -273,14 +273,14 @@ public class MaintenanceTypeDetails extends AppCompatActivity {
         btnUpdate.setVisibility(View.GONE);
     }
 
-    private void displayMileageOnly(int mileageDue) {
+    private void displayMileageOnly() {
         // First Line: Last Known Mileage
-        lblLastMaintenance.setText("Último Millaje:");
+        lblLastMaintenance.setText("Millaje:");
         txtLastDateMaintenance.setText(String.format(Locale.US, "%,d mi", carMileage));
         txtLastDateMaintenance.setEnabled(false);
 
         // Second Line: Next Maintenance Mileage
-        lblNextMaintenance.setText("Próximo Millaje:");
+        lblNextMaintenance.setText("Próximo Servicio:");
         txtNextMaintenance.setText(String.format(Locale.US, "%,d mi", mileageDue));
 
         // Hide time-related fields
@@ -292,13 +292,13 @@ public class MaintenanceTypeDetails extends AppCompatActivity {
 
     private void displayTimeOnly() {
         // First Line: Last Maintenance Date
-        lblLastMaintenance.setText("Último Mantenimiento:");
-        txtLastDateMaintenance.setHint("Seleccione fecha");
+        lblLastMaintenance.setText("Último Servicio:");
+        txtLastDateMaintenance.setHint("Seleccione" );
         txtLastDateMaintenance.setEnabled(true);
 
         // Second Line: Next Maintenance Date (Result)
-        lblNextMaintenance.setText("Próximo Mantenimiento:");
-        txtNextMaintenance.setHint("Calculado al guardar");
+        lblNextMaintenance.setText("Próximo Servicio:");
+        //txtNextMaintenance.setHint("Calculado al guardar");
         txtNextMaintenance.setEnabled(false);
 
         // Hide secondary fields
@@ -308,12 +308,12 @@ public class MaintenanceTypeDetails extends AppCompatActivity {
         txtDateMaintenance.setVisibility(View.GONE);
     }
 
-    private void displayBoth(int mileageDue) {
+    private void displayBoth() {
         // First Group: Mileage
-        lblLastMaintenance.setText("Último Millaje:");
+        lblLastMaintenance.setText("Millaje:");
         txtLastDateMaintenance.setText(String.format(Locale.US, "%,d mi", carMileage));
         txtLastDateMaintenance.setEnabled(false);
-        lblNextMaintenance.setText("Próx. Millaje:");
+        lblNextMaintenance.setText("Próximo Servicio:");
         txtNextMaintenance.setText(String.format(Locale.US, "%,d mi", mileageDue));
         txtNextMaintenance.setEnabled(false);
 
@@ -324,12 +324,12 @@ public class MaintenanceTypeDetails extends AppCompatActivity {
         lblDateMaintenance.setVisibility(View.VISIBLE);
         txtDateMaintenance.setVisibility(View.VISIBLE);
 
-        lblSelectDate.setText("Fecha Reciente:");
-        txtSelectDate.setHint("Seleccione fecha");
+        lblSelectDate.setText("Último Servicio:");
+        txtSelectDate.setHint("Seleccione");
         txtSelectDate.setEnabled(true);
 
-        lblDateMaintenance.setText("Próx. Fecha:");
-        txtDateMaintenance.setHint("Calculado al guardar");
+        lblDateMaintenance.setText("Próxima Fecha:");
+        txtDateMaintenance.setHint("Calculado");
         txtDateMaintenance.setEnabled(false);
     }
 
@@ -356,7 +356,7 @@ public class MaintenanceTypeDetails extends AppCompatActivity {
         // Logic for inserting into DB
         try {
             // Use the correct date field for insertion (only one date is needed in the DB)
-            LocalDate finalAlertDate = (alertDate != null) ? alertDate : LocalDate.now().plusYears(100); // Placeholder if only mileage is tracked
+            LocalDate finalAlertDate = (alertDate != null) ? alertDate : LocalDate.now().plusYears(0); // Placeholder if only mileage is tracked
             int finalMileageDue = mileageDue;
 
             // Assuming MyJDBC and Connection are correct
@@ -410,7 +410,7 @@ public class MaintenanceTypeDetails extends AppCompatActivity {
 
         // Logic for updating the DB
         try {
-            LocalDate finalAlertDate = (alertDate != null) ? alertDate : LocalDate.now().plusYears(100); // Placeholder
+            LocalDate finalAlertDate = (alertDate != null) ? alertDate : LocalDate.now().plusYears(0); // Placeholder
             int finalMileageDue = mileageDue;
 
             MyJDBC jdbc = new MyJDBC();
@@ -467,8 +467,9 @@ public class MaintenanceTypeDetails extends AppCompatActivity {
         int y = selectedDate.get(Calendar.YEAR);
         int m = selectedDate.get(Calendar.MONTH);
         int d = selectedDate.get(Calendar.DAY_OF_MONTH);
+        long now=System.currentTimeMillis();
 
-        new DatePickerDialog(this, (view, year, month, dayOfMonth) -> {
+        DatePickerDialog  datePickerDialog=new DatePickerDialog(this, (view, year, month, dayOfMonth) -> {
             Calendar newDate = Calendar.getInstance();
             newDate.set(year, month, dayOfMonth);
 
@@ -477,7 +478,10 @@ public class MaintenanceTypeDetails extends AppCompatActivity {
             String formattedDate = sdf.format(newDate.getTime());
             target.setText(formattedDate);
 
-        }, y, m, d).show();
+        }, y, m, d);
+
+        datePickerDialog.getDatePicker().setMaxDate(now);
+        datePickerDialog.show();
 
         // Returns today's date (or the initial date). The actual selected date is in the EditText.
         return LocalDate.of(y, m + 1, d);
@@ -547,16 +551,16 @@ public class MaintenanceTypeDetails extends AppCompatActivity {
 
         String title = "⚠️ Recordatorio Urgente de Mantenimiento - AL DIA APP";
         String message =
-                "**Estimado(a) usuario(a),**\n\n" +
-                        "El **Equipo de AL DIA APP** le envía esta importante notificación para recordarle que " +
+                "**Estimado(a) usuario(a),\n\n" +
+                        "El Equipo de AL DIA APP le envía esta importante notificación para recordarle que " +
                         "su vehículo requiere una atención inmediata.\n\n" +
-                        "**Detalles del Vehículo y Mantenimiento:**\n" +
-                        "Vehículo: **" + brand + " " + model + "**\n" +
-                        "Tablilla: **" + plate + "**\n" +
-                        "Mantenimiento Requerido: **" + maintenanceType + "**\n" +
-                        "Estado: **Vence Hoy**.\n\n" +
+                        "Detalles del Vehículo y Mantenimiento:\n" +
+                        "Vehículo: " + brand + " " + model + "\n" +
+                        "Tablilla: " + plate + "\n" +
+                        "Mantenimiento Requerido: " + maintenanceType + "\n" +
+                        "Estado: Vence Hoy.\n\n" +
                         "Para garantizar el rendimiento óptimo, la seguridad y la validez de su garantía, " +
-                        "le solicitamos **programar este servicio lo antes posible**.\n\n" +
+                        "le solicitamos programar este servicio lo antes posible.\n\n" +
                         "Agradecemos su atención y le deseamos un excelente día.\n\n" +
                         "Saludos cordiales,\n" +
                         "El Equipo de AL DIA APP";
