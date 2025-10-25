@@ -1,5 +1,6 @@
 package pupr.capstone.myapplication;
 
+import android.app.AlertDialog;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
@@ -313,5 +314,50 @@ public class ServicesSelect extends AppCompatActivity {
             this.year = year == null ? "" : year.trim();
             this.image = image;
         }
+    }
+    public void showRandomTip() {
+        // Create the dialog
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        View view = getLayoutInflater().inflate(R.layout.activity_tips, null);
+        builder.setView(view);
+
+        AlertDialog dialog = builder.create();
+        dialog.getWindow().setBackgroundDrawableResource(android.R.color.transparent);
+        dialog.setCanceledOnTouchOutside(true); // Close when touching outside
+
+        TextView tvMessage = view.findViewById(R.id.tvMessage);
+
+        // Thread for MySQL query
+        new Thread(() -> {
+            try {
+                // Use your existing connection class
+                MyJDBC myJDBC = new MyJDBC();
+                Connection con = myJDBC.obtenerConexion();
+
+                if (con != null) {
+                    PreparedStatement ps = con.prepareStatement(
+                            "SELECT car_tips FROM TIPS ORDER BY RAND() LIMIT 1");
+                    ResultSet rs = ps.executeQuery();
+
+                    if (rs.next()) {
+                        String tip = rs.getString("car_tips");
+                        runOnUiThread(() -> tvMessage.setText(tip));
+                    } else {
+                        runOnUiThread(() -> tvMessage.setText("No se encontraron consejos."));
+                    }
+
+                    rs.close();
+                    ps.close();
+                    con.close();
+                } else {
+                    runOnUiThread(() -> tvMessage.setText("Error al conectar con la base de datos."));
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+                runOnUiThread(() -> tvMessage.setText("Ocurrió un error al cargar el consejo."));
+            }
+        }).start();
+
+        dialog.show();
     }
 }

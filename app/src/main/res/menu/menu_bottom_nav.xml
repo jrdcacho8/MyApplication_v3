@@ -5,7 +5,7 @@
             android:icon="@drawable/ic_garage_24"
             android:title="Garaje"/>
     <item
-            android:id="@+id/nav_alerta"
+            android:id="@+id/nav_consejo"
             android:icon="@drawable/ic_tip_chat_24"
             android:title="Consejo"/>
     <item

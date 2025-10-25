@@ -1,5 +1,6 @@
 package pupr.capstone.myapplication;
 
+import android.app.AlertDialog;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -19,13 +20,13 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class GarageActivity extends AppCompatActivity {
-    //Trabajr codigo para que utilice arreglo de objetpos en vez de base de dato
+
     RecyclerView recyclerView;
 
     List<Vehicle> autos;
     AutoAdapter adapter;
     String userEmail;
-    private NotificationHelper notificationHelper;
+
 
 
     @Override
@@ -160,6 +161,52 @@ public class GarageActivity extends AppCompatActivity {
         i.putExtra("email", userEmail); // Pasar email al formulario de nuevo auto
         startActivity(i);
     }
+    public void showRandomTip() {
+        // Create the dialog
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        View view = getLayoutInflater().inflate(R.layout.activity_tips, null);
+        builder.setView(view);
+
+        AlertDialog dialog = builder.create();
+        dialog.getWindow().setBackgroundDrawableResource(android.R.color.transparent);
+        dialog.setCanceledOnTouchOutside(true); // Close when touching outside
+
+        TextView tvMessage = view.findViewById(R.id.tvMessage);
+
+        // Thread for MySQL query
+        new Thread(() -> {
+            try {
+                // Use your existing connection class
+                MyJDBC myJDBC = new MyJDBC();
+                Connection con = myJDBC.obtenerConexion();
+
+                if (con != null) {
+                    PreparedStatement ps = con.prepareStatement(
+                            "SELECT car_tips FROM TIPS ORDER BY RAND() LIMIT 1");
+                    ResultSet rs = ps.executeQuery();
+
+                    if (rs.next()) {
+                        String tip = rs.getString("car_tips");
+                        runOnUiThread(() -> tvMessage.setText(tip));
+                    } else {
+                        runOnUiThread(() -> tvMessage.setText("No se encontraron consejos."));
+                    }
+
+                    rs.close();
+                    ps.close();
+                    con.close();
+                } else {
+                    runOnUiThread(() -> tvMessage.setText("Error al conectar con la base de datos."));
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+                runOnUiThread(() -> tvMessage.setText("Ocurrió un error al cargar el consejo."));
+            }
+        }).start();
+
+        dialog.show();
+    }
+
 
     public void setGarageName(String email) throws SQLException {
         MyJDBC myJDBC1 = new MyJDBC();

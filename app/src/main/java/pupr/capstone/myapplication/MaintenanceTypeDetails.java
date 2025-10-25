@@ -145,7 +145,7 @@ public class MaintenanceTypeDetails extends AppCompatActivity {
             }
             // Schedule the notification/email regardless of upload/edit success for now
             if (alertDate != null) {
-                // scheduleTestNotification(carBrand, carLicensePlate, maintenanceType); // Consider removing test notification in final version
+                //scheduleTestNotification(carBrand, carLicensePlate, maintenanceType); // Consider removing test notification in final version
                 scheduleNotificationManagement(carBrand, carModel, maintenanceType, carLicensePlate, alertDate, userEmail);
                 Toast.makeText(this, "Actualizado", Toast.LENGTH_SHORT).show();
             } else {
@@ -572,6 +572,7 @@ public class MaintenanceTypeDetails extends AppCompatActivity {
                 title,
                 message
         );
+
 
         Toast.makeText(this,
                 "Actualizado y correo programado para las 7:00 AM del " + alertDate.format(DATE_FORMATTER),

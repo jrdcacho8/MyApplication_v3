@@ -38,24 +38,32 @@ public final class BottomNavRouter {
         bottomNav.setOnItemSelectedListener(item -> {
             final int clickedId = item.getItemId();
 
-            // Si es el mismo item, consume y no navega
             if (clickedId == currentItemId) return true;
+
+            // Handle the "Consejo" button
+            if (clickedId == R.id.nav_consejo) {
+                if (activity instanceof GarageActivity) {
+                    ((GarageActivity) activity).showRandomTip();
+                } else if (activity instanceof ServicesSelect) {
+                    ((ServicesSelect) activity).showRandomTip();
+                }else if (activity instanceof UserActivity) {
+                    ((UserActivity) activity).showRandomTip();
+                }
+                return false;
+            }
 
             Class<?> target = resolveTargetActivity(clickedId);
             if (target == null) return false;
 
             Intent i = new Intent(activity, target);
-            if (userEmail != null) {
-                i.putExtra("email", userEmail);
-            }
-
+            if (userEmail != null) i.putExtra("email", userEmail);
             activity.startActivity(i);
-            // transición y cierre opcional para que Back no te regrese a la pantalla anterior
             activity.overridePendingTransition(0, 0);
             activity.finish();
 
             return true;
         });
+
     }
 
     /**
@@ -65,8 +73,6 @@ public final class BottomNavRouter {
     private static Class<?> resolveTargetActivity(@IdRes int menuItemId) {
         if (menuItemId == R.id.nav_garaje) {
             return GarageActivity.class;
-        //} else if (menuItemId == R.id.nav_alerta) {
-           // return AlertsActivity.class;      // <-- cámbiala si tu clase se llama distinto
         } else if (menuItemId == R.id.nav_informe) {
             return ServicesSelect.class;      // pantalla “Informe”
         } else if (menuItemId == R.id.nav_perfil) {
