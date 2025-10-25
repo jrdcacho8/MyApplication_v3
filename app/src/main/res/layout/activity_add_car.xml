@@ -37,7 +37,7 @@
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             android:layout_marginTop="16dp"
-            android:layout_marginEnd="20dp"/>
+            android:layout_marginEnd="20dp" android:onClick="guardarVehiculo"/>
 
     <!-- 🔹 Botón Guardar buttonGuardar -->
 
