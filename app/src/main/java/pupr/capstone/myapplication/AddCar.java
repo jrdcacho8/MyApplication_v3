@@ -60,7 +60,7 @@ public class AddCar extends AppCompatActivity {
         spinnerYear = findViewById(R.id.spinnerYear);
 
         // Listas base
-        String[] marcas = {"Seleccione una marca", "Audi", "BMW", "Chrysler", "Dodge", "Ford", "Hyundai", "Infiniti", "Kia",
+        String[] marcas = {"Seleccione una marca","Acura","Audi", "BMW", "Chrysler", "Dodge", "Ford", "Hyundai", "Infiniti", "Kia",
                 "Lamborghini", "Lexus", "Mazda", "Mercedes-Benz", "Mitsubishi", "Nissan", "Tesla", "Toyota", "Volkswagen", "Volvo"};
 
         String[] color = {"Seleccione un color", "Amarillo", "Anaranjado", "Azul", "Beige", "Blanco", "Dorado",
@@ -68,6 +68,8 @@ public class AddCar extends AppCompatActivity {
 
         // Modelos por marca
         Map<String, String[]> modelosPorMarca = new HashMap<>();
+
+        modelosPorMarca.put("Acura", new String[]{"ADX", "CL", "Integra", "MDX", "NSX", "RDX", "RSX","TLX", "ZDX","Otro"});
         modelosPorMarca.put("Audi", new String[]{"A3 – A8", "Q3 – Q8", "R8", "TT", "Versiones S/RS", "Otro"});
         modelosPorMarca.put("BMW", new String[]{"M3", "M4", "M5", "M8", "Serie 2 – Serie 8", "X1 – X7", "Z4", "Otro"});
         modelosPorMarca.put("Chrysler", new String[]{"300", "Pacifica", "Voyager", "Otro"});

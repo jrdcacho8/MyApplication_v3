@@ -204,7 +204,7 @@ public class ServicesActivity extends AppCompatActivity {
 
     private void setupSpinner() {
         String[] tiposMantenimiento = {
-                "Seleccionar tipo...", "Cambio de Aceite de Motor", "Reemplazo de 'Coolant'('Flushing')",
+                "Seleccionar tipo...", "Cambio de Aceite de Motor", "Reemplazo de Refrigerante",
                 "Rotación de Gomas", "Alineamiento de gomas","Reemplazo de Gomas", "Reemplazo de Discos y/o Frenos","Otro"
         };
         // We use an ArrayList for the data source so we can add new items dynamically
@@ -458,7 +458,7 @@ public class ServicesActivity extends AppCompatActivity {
 
         // Crear el EditText para la entrada del usuario
         final EditText input = new EditText(this);
-        input.setHint("Ej. Reemplazo de Filtro de Aire");
+        input.setHint("Ej. Reemplazo de Alternador");
 
         new AlertDialog.Builder(this)
                 .setTitle("Tipo de Mantenimiento Personalizado")

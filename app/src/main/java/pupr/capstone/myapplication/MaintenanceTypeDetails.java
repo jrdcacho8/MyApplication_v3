@@ -151,7 +151,9 @@ public class MaintenanceTypeDetails extends AppCompatActivity {
             } else {
                 Toast.makeText(this, "Error: No se pudo calcular la fecha de alerta.", Toast.LENGTH_LONG).show();
             }
+            finishAndNavigateToMaintenanceActivity();
         });
+
     }
 
     private void toggleEditMode(boolean enable) {
@@ -161,6 +163,7 @@ public class MaintenanceTypeDetails extends AppCompatActivity {
 
         // Try to parse the next maintenance date to pre-fill the last maintenance date field
         String nextDate = txtNextMaintenance.getText().toString().trim();
+        txtNextMaintenance.setText("");
         if (!nextDate.isEmpty() && nextDate.contains("-")) { // Simple check for date format
             try {
                 // If it's a date, set it to the last date field to allow easy re-scheduling
@@ -388,6 +391,7 @@ public class MaintenanceTypeDetails extends AppCompatActivity {
             e.printStackTrace();
             Toast.makeText(this, "Error de DB: " + e.getMessage(), Toast.LENGTH_LONG).show();
         }
+
     }
 
     private void editAlertInDB() {
@@ -578,6 +582,19 @@ public class MaintenanceTypeDetails extends AppCompatActivity {
                 "Actualizado y correo programado para las 7:00 AM del " + alertDate.format(DATE_FORMATTER),
                 Toast.LENGTH_LONG
         ).show();
+    }
+
+    private void finishAndNavigateToMaintenanceActivity() {
+        finish();
+        Intent intent = new Intent(this, MaintenanceActivity.class);
+
+        intent.putExtra("marca", carBrand);
+        intent.putExtra("license_plate", carLicensePlate);
+        intent.putExtra("model", carModel);
+        intent.putExtra("email", userEmail);
+        intent.putExtra("car_mileage", carMileage);
+        startActivity(intent);
+        startActivity(intent);
     }
 
     private int mapPictureKeyToDrawable(int key) {

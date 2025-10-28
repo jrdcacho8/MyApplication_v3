@@ -122,63 +122,67 @@ public class MaintenanceActivity extends AppCompatActivity {
 
 
                     switch (tipo) {
-                        case "Aceite de Motor Convencional":
+                        case "Aceite de Motor (Aceite Convencional)":
                             maintenance_picture = 1;
 
                             break;
-                        case "Aceite de Motor Sintético":
+                        case "Aceite de Motor (Aceite Sintético)":
                             maintenance_picture = 2;
                             break;
-                        case "Presión y profundidad de los gomas":
+                        case "Presión y Condición de Gomas":
                             maintenance_picture = 3;
                             break;
-                        case "Cambio de escobillas del limpiaparabrisas":
+                        case "Escobillas Limpiaparabrisas":
                             maintenance_picture = 4;
                             break;
-                        case "Filtro de aire (motor)":
+                        case "Filtro de Aire (Motor)":
                             maintenance_picture = 5;
                             break;
-                        case "Líquido refrigerante/anticongelante":
+                        case "Refrigerante/Anticongelante":
                             maintenance_picture = 6;
                             break;
-                        case "Líquido de la transmisión automática":
+                        case "Líquido Transmisión Automática":
                             maintenance_picture = 7;
                             break;
-                        case "Líquido de la dirección asistida (power steering)":
+                        case "Líquido Dirección Asistida":
                             maintenance_picture = 8;
                             break;
-                        case "Líquido limpiaparabrisas":
+                        case "Líquido Limpiaparabrisas":
                             maintenance_picture = 9;
                             break;
-                        case "Correas y mangas":
+                        case "Correas / Mangas":
                             maintenance_picture = 10;
                             break;
                         case "Batería":
                             maintenance_picture = 11;
                             break;
-                        case "Rotación de gomas":
+                        case "Rotación de Gomas":
                             maintenance_picture = 12;
                             break;
                         case "Frenos":
                             maintenance_picture = 13;
                             break;
-                        case "Filtro de aire (cabina)":
+                        case "Filtro de Aire (Cabina)":
                             maintenance_picture = 14;
                             break;
-                        case "Sistema de escape":
+                        case "Sistema de Escape":
                             maintenance_picture = 15;
                             break;
-                        case "Bujías Convencionales":
+                        case "Bujías (bujías convencionales)":
                             maintenance_picture = 16;
                             break;
-                        case "Bujías de iridio":
+                        case "Bujías (bujías de iridio)":
                             maintenance_picture = 17;
                             break;
-                        case "Alineación de gomas":
+                        case "Alineación de Gomas":
                             maintenance_picture = 18;
                             break;
-                        default:
+                        case "Correa de Distribución":
                             maintenance_picture = 19;
+                            break;
+
+                        default:
+                            maintenance_picture = 20;
                             break;
                     }//poner setters
 

@@ -69,8 +69,8 @@ public class MaintenanceAdapter extends RecyclerView.Adapter<MaintenanceAdapter.
                 holder.txtDueDate.setVisibility(View.GONE);
                 System.err.println("Date parsing error for: " + alertDate + e.getMessage());
             }
-        } else {
-            holder.txtDueDate.setVisibility(View.GONE);
+        } else {    
+            holder.txtDueDate.setText("-");
         }
 
         // 2. Process and set the Mileage TextView
@@ -80,8 +80,8 @@ public class MaintenanceAdapter extends RecyclerView.Adapter<MaintenanceAdapter.
             holder.txtMileageDue.setText(mileageStr);
             holder.txtMileageDue.setVisibility(View.VISIBLE);
         } else {
-            holder.lblMileageDue.setVisibility(View.GONE);
-            holder.txtMileageDue.setVisibility(View.GONE);
+
+            holder.txtMileageDue.setText("-");
         }
 
         // 3. Set visibility for the label based on if any alert is present
@@ -135,6 +135,7 @@ public class MaintenanceAdapter extends RecyclerView.Adapter<MaintenanceAdapter.
         map.put(16, R.drawable.reemplazo_bujias);
         map.put(17, R.drawable.reemplazo_bujias);
         map.put(18, R.drawable.wheel_alignment);
+        map.put(19, R.drawable.timing_belt);
         return map;
     }
 
