@@ -6,6 +6,7 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Build;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.*;
 import androidx.core.app.ActivityCompat;
@@ -171,7 +172,7 @@ public class MaintenanceTypeDetails extends AppCompatActivity {
                 txtLastDateMaintenance.setText(mantLastDate.format(DATE_FORMATTER));
             } catch (Exception e) {
                 // If it's a mileage or parsing fails, just leave it alone
-                // Log.e("EditMode", "Could not parse next maintenance date: " + e.getMessage());
+                Log.e("EditMode", "Could not parse next maintenance date: " + e.getMessage());
             }
         }
 
@@ -184,8 +185,12 @@ public class MaintenanceTypeDetails extends AppCompatActivity {
 
         // Show date pickers needed for the specific maintenance type
         if (mileageTrigger && timeTrigger) {
+            LocalDate mantLastDate = LocalDate.parse(nextDate, DATE_FORMATTER);
+            txtLastDateMaintenance.setText(String.format(Locale.US, "%,d mi", carMileage));
+            txtNextMaintenance.setText(String.format(Locale.US, "%,d mi", mileageDue));
             lblSelectDate.setVisibility(View.VISIBLE);
             txtSelectDate.setVisibility(View.VISIBLE);
+            txtSelectDate.setText(mantLastDate.format(DATE_FORMATTER));
             lblDateMaintenance.setVisibility(View.VISIBLE);
             txtDateMaintenance.setVisibility(View.VISIBLE);
         }

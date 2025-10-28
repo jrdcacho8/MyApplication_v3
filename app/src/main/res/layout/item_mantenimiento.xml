@@ -87,7 +87,7 @@
                 android:id="@+id/lblDueDate"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:text="Próximo Fecha:"
+                android:text="Próxima Fecha:"
                 android:textStyle="bold"
                 android:textSize="14sp"
                 android:textColor="@color/black"
@@ -99,7 +99,7 @@
 
                 app:layout_constraintTop_toBottomOf="@+id/txtMileageDue"
                 app:layout_constraintBottom_toTopOf="@+id/txtDueDate"
-                tools:text="Próximo Fecha: (Label)" />
+                tools:text="Próximo Fecha: (Label)"/>
 
         <TextView
                 android:id="@+id/txtDueDate"
