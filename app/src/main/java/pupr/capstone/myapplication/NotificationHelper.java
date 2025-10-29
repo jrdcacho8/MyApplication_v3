@@ -53,6 +53,11 @@ public class NotificationHelper {
         intent.putExtra(NotificationReceiver.EXTRA_SUBJECT, subject);
         intent.putExtra(NotificationReceiver.EXTRA_BODY, body);
 
+// ✅ Agregar título y mensaje para que la notificación no salga vacía
+        intent.putExtra("title", "Alerta de Mantenimiento");
+        intent.putExtra("message", "Para mas información favor verificar correo electronico!!!");
+
+
         int requestCode = (int) (triggerAtMillis % Integer.MAX_VALUE);
 
         PendingIntent pi = PendingIntent.getBroadcast(

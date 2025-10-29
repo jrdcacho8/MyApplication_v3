@@ -146,7 +146,6 @@ public class MaintenanceTypeDetails extends AppCompatActivity {
             }
             // Schedule the notification/email regardless of upload/edit success for now
             if (alertDate != null) {
-                //scheduleTestNotification(carBrand, carLicensePlate, maintenanceType); // Consider removing test notification in final version
                 scheduleNotificationManagement(carBrand, carModel, maintenanceType, carLicensePlate, alertDate, userEmail);
                 Toast.makeText(this, "Actualizado", Toast.LENGTH_SHORT).show();
             } else {
@@ -526,23 +525,7 @@ public class MaintenanceTypeDetails extends AppCompatActivity {
         return existingDate;
     }
 
-    private void scheduleTestNotification(String car_brand,  String plate, String maintenanceType) {
-        try {
-            String subject = "Alerta de Mantenimiento";
-            String body =
-                    "El Vehiculo " + car_brand + " Tablilla " + carLicensePlate +
-                            " necesita " + maintenanceType + " el cual vence hoy.";
-            Calendar calendar = Calendar.getInstance();
-            calendar.add(Calendar.SECOND, 10);
-            long time = calendar.getTimeInMillis();
 
-            notificationHelper.scheduleNotification(time, subject, body);
-
-        } catch (Exception e) {
-            e.printStackTrace();
-            Toast.makeText(this, "Error al programar la notificación", Toast.LENGTH_SHORT).show();
-        }
-    }
     private void requestNotificationPermission() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
             if (ContextCompat.checkSelfPermission(this, Manifest.permission.POST_NOTIFICATIONS)
