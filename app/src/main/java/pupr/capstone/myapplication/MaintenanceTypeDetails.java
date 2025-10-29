@@ -149,7 +149,7 @@ public class MaintenanceTypeDetails extends AppCompatActivity {
                 scheduleNotificationManagement(carBrand, carModel, maintenanceType, carLicensePlate, alertDate, userEmail);
                 Toast.makeText(this, "Actualizado", Toast.LENGTH_SHORT).show();
             } else {
-                Toast.makeText(this, "Error: No se pudo calcular la fecha de alerta.", Toast.LENGTH_LONG).show();
+               // Toast.makeText(this, "Error: No se pudo calcular la fecha de alerta.", Toast.LENGTH_LONG).show();
             }
             finishAndNavigateToMaintenanceActivity();
         });
@@ -363,7 +363,7 @@ public class MaintenanceTypeDetails extends AppCompatActivity {
         // Logic for inserting into DB
         try {
             // Use the correct date field for insertion (only one date is needed in the DB)
-            LocalDate finalAlertDate = (alertDate != null) ? alertDate : LocalDate.now().plusYears(0); // Placeholder if only mileage is tracked
+            LocalDate finalAlertDate = (alertDate != null) ? alertDate : LocalDate.now().plusYears(1); // Placeholder if only mileage is tracked
             int finalMileageDue = mileageDue;
 
             // Assuming MyJDBC and Connection are correct
@@ -418,7 +418,7 @@ public class MaintenanceTypeDetails extends AppCompatActivity {
 
         // Logic for updating the DB
         try {
-            LocalDate finalAlertDate = (alertDate != null) ? alertDate : LocalDate.now().plusYears(0); // Placeholder
+            LocalDate finalAlertDate = (alertDate != null) ? alertDate : LocalDate.now().plusYears(1); // Placeholder
             int finalMileageDue = mileageDue;
 
             MyJDBC jdbc = new MyJDBC();

@@ -60,7 +60,7 @@ public class AddCar extends AppCompatActivity {
         spinnerYear = findViewById(R.id.spinnerYear);
 
         // Listas base
-        String[] marcas = {"Seleccione una marca","Acura","Audi", "BMW", "Chrysler", "Dodge", "Ford", "Hyundai", "Infiniti", "Kia",
+        String[] marcas = {"Seleccione una marca","Acura","Audi", "BMW", "Chrysler", "Dodge", "Ford","Honda", "Hyundai", "Infiniti", "Kia",
                 "Lamborghini", "Lexus", "Mazda", "Mercedes-Benz", "Mitsubishi", "Nissan", "Tesla", "Toyota", "Volkswagen", "Volvo"};
 
         String[] color = {"Seleccione un color", "Amarillo", "Anaranjado", "Azul", "Beige", "Blanco", "Dorado",
@@ -75,6 +75,7 @@ public class AddCar extends AppCompatActivity {
         modelosPorMarca.put("Chrysler", new String[]{"300", "Pacifica", "Voyager", "Otro"});
         modelosPorMarca.put("Dodge", new String[]{"Charger", "Challenger", "Durango", "Hornet", "Grand Caravan", "Ram 1500", "Viper", "Journey", "Dart", "Otro"});
         modelosPorMarca.put("Ford", new String[]{"Bronco", "Bronco Sport", "Edge", "Escape", "Expedition", "Explorer", "F150", "Maverick", "Mustang", "Ranger", "Transit", "Otro"});
+        modelosPorMarca.put("Honda", new String[]{"CR-V", "Civic", "Accord", "HR-V", "Pilot", "Odyssey", "Ridgeline", "Otro"});
         modelosPorMarca.put("Hyundai", new String[]{"Elantra", "Kona", "Palisade", "Santa Cruz", "Santa Fe", "Sonata", "Tucson", "Venue", "Otro"});
         modelosPorMarca.put("Infiniti", new String[]{"Q50", "Q60", "QX50", "QX55", "QX60", "QX80", "Otro"});
         modelosPorMarca.put("Kia", new String[]{"Carnival", "K4", "K5", "Niro", "Seltos", "Sorento", "Soul", "Sportage", "Stinger", "Telluride", "Otro"});
