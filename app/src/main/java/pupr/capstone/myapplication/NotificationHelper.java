@@ -44,9 +44,9 @@ public class NotificationHelper {
                                                      String body) {        // opcional (ver comentario abajo)
 
         // 7:00 AM en la zona local del dispositivo
-        //ZonedDateTime zdt = ZonedDateTime.of(date, LocalTime.of(7, 0), ZoneId.systemDefault());
-        //long triggerAtMillis = zdt.toInstant().toEpochMilli();
-        long triggerAtMillis = System.currentTimeMillis() + 10_000; // 10 000 ms = 10 s
+        ZonedDateTime zdt = ZonedDateTime.of(date, LocalTime.of(7, 0), ZoneId.systemDefault());
+        long triggerAtMillis = zdt.toInstant().toEpochMilli();
+        //long triggerAtMillis = System.currentTimeMillis() + 10_000; // 10 000 ms = 10 s
         Intent intent = new Intent(context, NotificationReceiver.class);
         intent.setAction(NotificationReceiver.ACTION_SEND_MAINTENANCE_EMAIL);
         intent.putExtra(NotificationReceiver.EXTRA_RECIPIENTS, recipients);
